@@ -19,3 +19,7 @@
 # PHPStorm
 .phpstorm.meta.php
 
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
