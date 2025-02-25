@@ -23,3 +23,7 @@
 ###> phpstan/phpstan ###
 phpstan.neon
 ###< phpstan/phpstan ###
+
+# phpunit output
+/phpunit_output/*
+.phpunit.result.cache
