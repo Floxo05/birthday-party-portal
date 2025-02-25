@@ -39,7 +39,7 @@ jobs:
           --coverage-html phpunit_output/coverage_html 
 
       - name: 📤 Upload Coverage Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
           path: phpunit_output/
