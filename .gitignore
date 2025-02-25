@@ -1,0 +1,21 @@
+# Symfony standard .gitignore
+
+# Symfony directories
+/var/*
+/vendor/*
+/node_modules/*
+
+# Symfony IDE files
+.idea/
+.vscode/
+
+# Logs
+/var/log/*
+
+# Symfony specific
+.env.local
+.env.*.local
+
+# PHPStorm
+.phpstorm.meta.php
+
