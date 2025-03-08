@@ -1,0 +1,9 @@
+body {
+    background-color: skyblue;
+}
+
+// Bootstrap-Variablen überschreiben (falls gewünscht)
+$primary: #ff5733;  // Ändert die Hauptfarbe von Bootstrap
+
+// Bootstrap laden
+@import "~bootstrap/scss/bootstrap";
