@@ -1,0 +1,36 @@
+@import "~bootstrap/scss/bootstrap";
+
+// 🌞 Light Mode Farben (Überschreiben der Bootstrap-Variablen)
+$primary: #f15c84;
+$secondary: #6C757D;
+$success: #28C76F;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #EA5455;
+$light: #F8F9FA;
+$dark: #212529;
+
+// 🌙 Dark Mode Farben (werden per CSS-Variablen gesetzt, da SCSS nicht dynamisch ist)
+:root {
+    --bs-primary: #{$primary};
+    --bs-secondary: #{$secondary};
+    --bs-success: #{$success};
+    --bs-info: #{$info};
+    --bs-warning: #{$warning};
+    --bs-danger: #{$danger};
+    --bs-light: #{$light};
+    --bs-dark: #{$dark};
+}
+
+[data-theme="dark"] {
+    --bs-primary: #4A90E2;
+    --bs-secondary: #555B6E;
+    --bs-success: #2ECC71;
+    --bs-info: #17A2B8;
+    --bs-warning: #E4A11B;
+    --bs-danger: #E74C3C;
+    --bs-light: #1E1E2F;
+    --bs-dark: #E4E6EB;
+}
+
+// 2️⃣ Jetzt erst Bootstrap importieren, damit es unsere Werte übernimmt!

@@ -1,11 +1,79 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Testseite – Farbpalette & UI-Elemente{% endblock %}
 
 {% block body %}
     <div class="container text-center mt-5">
         <h1 class="text-primary">Hallo, Symfony mit Bootstrap!</h1>
-        <p>Diese Seite nutzt Webpack Encore und Bootstrap.</p>
-        <a href="#" class="btn btn-success">Klick mich</a>
+        <p class="text-secondary">Diese Seite nutzt Webpack Encore, Bootstrap und Dark/Light Mode.</p>
+
+        <!-- 🌍 Buttons in verschiedenen Farben -->
+        <div class="mt-4">
+            <a href="#" class="btn btn-primary">Primär-Button</a>
+            <a href="#" class="btn btn-secondary">Sekundär-Button</a>
+            <a href="#" class="btn btn-success">Erfolgs-Button</a>
+            <a href="#" class="btn btn-danger">Fehler-Button</a>
+            <a href="#" class="btn btn-warning">Warnungs-Button</a>
+            <a href="#" class="btn btn-info">Info-Button</a>
+        </div>
+
+        <!-- 🟦 Badges -->
+        <div class="mt-4">
+            <span class="badge bg-primary">Primär</span>
+            <span class="badge bg-secondary">Sekundär</span>
+            <span class="badge bg-success">Erfolg</span>
+            <span class="badge bg-danger">Fehler</span>
+            <span class="badge bg-warning text-dark">Warnung</span>
+            <span class="badge bg-info text-dark">Info</span>
+        </div>
+
+        <!-- 📝 Input-Felder & Form -->
+        <div class="mt-5 text-start">
+            <form>
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" placeholder="Gib deinen Namen ein">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">E-Mail</label>
+                    <input type="email" class="form-control" placeholder="E-Mail-Adresse">
+                </div>
+                <button type="submit" class="btn btn-primary">Absenden</button>
+            </form>
+        </div>
+
+        <!-- 🎨 Karten für UI-Test -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Primär</h5>
+                        <p class="card-text">Dies ist eine Beispiel-Karte mit Primärfarbe.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-success">Erfolg</h5>
+                        <p class="card-text">Eine Erfolgskarte mit grüner Farbe.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-danger">Fehler</h5>
+                        <p class="card-text">Diese Karte zeigt einen Fehler an.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔄 Dark Mode Toggle Button (Test) -->
+        <div class="mt-5">
+            <button class="btn btn-outline-secondary" id="theme-toggle">🌙 Dark Mode</button>
+        </div>
+
     </div>
 {% endblock %}
