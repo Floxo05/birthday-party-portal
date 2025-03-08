@@ -33,7 +33,7 @@ jobs:
       - name: 🧪 Run PHPUnit Tests with Code Coverage
         run: |
           mkdir -p phpunit_output
-          XDEBUG_MODE=coverage vendor/bin/phpunit \
+          XDEBUG_MODE=coverage vendor/bin/phpunit --debug \
           --log-junit phpunit_output/report.xml \
           --coverage-cobertura phpunit_output/coverage.xml \
           --coverage-html phpunit_output/coverage_html 

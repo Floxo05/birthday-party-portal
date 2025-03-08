@@ -1,0 +1,83 @@
+@startuml
+
+package UserPackage {
+    class User{
+
+    }
+}
+
+package Game {
+    abstract class Game{
+    }
+
+    class UserScore {}
+
+    class GameSelection{}
+
+    Game "1" -- "0..*" UserScore : has
+    GameSelection "0..*" -- "1" Game : has
+}
+
+package ShopPackage {
+    class Shop
+
+    class ShopItem {
+    }
+
+    class ShopTransaction{
+    }
+
+    class ShopBalance {}
+
+    Shop "1" -- "0..*" ShopItem : has
+    Shop "1" -- "0..*" ShopTransaction : has
+    ShopBalance "0..*" - "1" Shop : has
+}
+
+
+
+package PartyPackage {
+    package MessagePackage {
+        class Message {
+        }
+
+        enum MessageStatus {
+            SENT
+            READ
+            ACKNOWLEDGED
+        }
+    }
+
+    class Party {}
+
+    abstract class PartyMember {
+
+    }
+
+    class Guest extends PartyMember {
+
+    }
+
+    class Host extends PartyMember {
+
+    }
+
+    class PartyMessage {
+        +getMessageStatus(): MessageStatus
+    }
+
+    Party "1" -- "0..*" PartyMember : has
+    PartyMessage "0..*" -- "1" Party : has
+    PartyMessage "0..*" -- "1" Message : has
+    PartyMessage "0..*" -- "1" MessageStatus
+    PartyMessage "0..*" -- "1" PartyMember : belongs to
+}
+
+User "1" -- "0..*" PartyMember : is
+Shop "1" -- "1" Party : has
+User "1" -- "0..*" ShopBalance : has
+User "1" -- "0..*" UserScore
+GameSelection "0..*" -- "1" Party : has
+
+
+@enduml
