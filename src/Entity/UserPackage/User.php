@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
@@ -26,7 +27,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Uuid $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
     private ?string $username = null;
+
+    #[ORM\Column(length: 180)]
+    #[Assert\NotBlank]
+    private ?string $name = null;
 
     /**
      * @var list<string> The user roles
@@ -154,5 +160,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): void
+    {
+        $this->name = $name;
     }
 }

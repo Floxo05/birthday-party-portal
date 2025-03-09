@@ -18,13 +18,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // Prüfen, ob ein Theme gespeichert ist
     const savedTheme = getCookie("theme") || "light";
     htmlElement.setAttribute("data-theme", savedTheme);
-    toggleBtn.innerText = savedTheme === "dark" ? "☀ Light Mode" : "🌙 Dark Mode";
+    toggleBtn.innerText = savedTheme === "dark" ? "☀" : "🌙";
 
     toggleBtn.addEventListener("click", () => {
         const newTheme = htmlElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
         htmlElement.setAttribute("data-theme", newTheme);
         setCookie("theme", newTheme, 365); // Speichert Theme für 1 Jahr
-        toggleBtn.innerText = newTheme === "dark" ? "☀ Light Mode" : "🌙 Dark Mode";
+        toggleBtn.innerText = newTheme === "dark" ? "☀" : "🌙";
     });
 
     // 🎯 Erst nach dem Laden die Transition aktivieren!

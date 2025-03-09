@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block navigation %}
+{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center ">
+        <div class="card p-4 shadow-lg" style="max-width: 400px; width: 100%;">
+            <h2 class="text-center">Login</h2>
+
+            {% if error %}
+                <div class="alert alert-danger">Falsche Anmeldedaten</div>
+            {% endif %}
+
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+
+{#            <a href="{{ path('register') }}" class="d-block text-center mt-3">Noch kein Account? Registrieren</a>#}
+        </div>
+    </div>
+{% endblock %}
