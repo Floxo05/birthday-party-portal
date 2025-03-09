@@ -1,0 +1,29 @@
+@import "../abstracts/variables";
+@import "../abstracts/variables-dark";
+
+.card {
+  background-color: var(--card-bg); // 🔥 Unsere Variable durchsetzen
+  color: var(--bs-card-text);
+  border-radius: var(--bs-card-border-radius);
+  padding: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--bs-gray-light);
+}
+
+//.card-body {
+//  background-color: var(--bs-card-bg) !important; // 🔥 Auch für den Card Body erzwingen
+//  color: var(--bs-card-text);
+//}
+
+// Dark Mode Anpassungen
+[data-theme="dark"] .card {
+  background-color: var(--card-bg);
+  color: var(--bs-card-text);
+  border: 1px solid var(--bs-gray);
+  box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.05);
+}
+//
+//[data-theme="dark"] .card-body {
+//  background-color: var(--bs-card-bg) !important;
+//  color: var(--bs-card-text);
+//}
