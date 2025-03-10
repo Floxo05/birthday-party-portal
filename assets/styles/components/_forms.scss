@@ -1,0 +1,38 @@
+@import "../abstracts/variables";
+@import "../abstracts/variables-dark";
+
+input, textarea, select {
+  border-radius: 6px;
+  border: 1px solid var(--bs-gray);
+  padding: 10px;
+  background-color: var(--bs-light);
+  color: var(--bs-dark);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--bs-gray);
+  opacity: 0.7;
+}
+
+.form-text {
+  color: var(--bs-gray-dark);
+}
+
+// Dark Mode
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: var(--bs-light);
+  color: var(--bs-dark);
+  border: 1px solid var(--bs-gray-light);
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: var(--bs-gray-light);
+  opacity: 0.6;
+}
+
+[data-theme="dark"] .form-text {
+  color: var(--bs-gray-light);
+}

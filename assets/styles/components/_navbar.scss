@@ -1,0 +1,13 @@
+@import "../abstracts/variables";
+
+.navbar {
+  background-color: var(--bs-dark);
+}
+
+.navbar .nav-link {
+  color: var(--bs-light);
+}
+
+.navbar .nav-link:hover {
+  color: var(--bs-primary);
+}

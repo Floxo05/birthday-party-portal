@@ -1,0 +1,74 @@
+@import "../abstracts/variables";
+
+// 🌍 Basis-Button Styles
+button, .btn {
+  //border-radius: 8px;
+  font-weight: bold;
+  //padding: 10px 16px;
+  transition: background 0.3s, filter 0.3s;
+}
+
+// 🎨 Primär-Button
+.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: var(--bs-dark);
+}
+
+.btn-primary:hover {
+  filter: brightness(90%);
+}
+
+// Sekundär-Button
+.btn-secondary {
+  background-color: var(--bs-secondary);
+  border-color: var(--bs-secondary);
+}
+
+.btn-primary:hover {
+  filter: brightness(90%);
+}
+
+// ✅ Erfolg-Button
+.btn-success {
+  background-color: var(--bs-success);
+  border-color: var(--bs-success);
+  color: white;
+}
+
+.btn-success:hover {
+  filter: brightness(90%);
+}
+
+// ⚠ Warnungs-Button
+.btn-warning {
+  background-color: var(--bs-warning);
+  border-color: var(--bs-warning);
+  color: black;
+}
+
+.btn-warning:hover {
+  filter: brightness(90%);
+}
+
+// 🚨 Fehler-Button
+.btn-danger {
+  background-color: var(--bs-danger);
+  border-color: var(--bs-danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  filter: brightness(90%);
+}
+
+// ℹ Info-Button
+.btn-info {
+  background-color: var(--bs-info);
+  border-color: var(--bs-info);
+  color: white;
+}
+
+.btn-info:hover {
+  filter: brightness(90%);
+}

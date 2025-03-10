@@ -1,71 +1,15 @@
+// 1️⃣ Bootstrap importieren
 @import "~bootstrap/scss/bootstrap";
 
-// 🌞 Light Mode Farben
-$primary-color: #007BFF;
-$secondary-color: #FF9F43;
-$success-color: #28C76F;
-$error-color: #EA5455;
-$background-color: #F8F9FA;
-$text-color: #212529;
-$card-background: #FFFFFF;
-$border-radius: 8px;
+// 2️⃣ Unsere Variablen laden
+@import "abstracts/variables";
+@import "abstracts/variables-dark";
 
-// 🌙 Dark Mode Farben
-$dark-primary-color: #4A90E2;
-$dark-secondary-color: #FFB74D;
-$dark-success-color: #2ECC71;
-$dark-error-color: #E74C3C;
-$dark-background-color: #1E1E2F;
-$dark-text-color: #E4E6EB;
-$dark-card-background: #282C36;
+// 3️⃣ Komponentenspezifische SCSS-Dateien
+@import "components/buttons";
+@import "components/navbar";
+@import "components/forms";
+@import "components/cards";
 
-// 🌎 Standard Theme setzen (Light Mode)
-:root {
-    --primary-color: #{$primary-color};
-    --secondary-color: #{$secondary-color};
-    --success-color: #{$success-color};
-    --error-color: #{$error-color};
-    --background-color: #{$background-color};
-    --text-color: #{$text-color};
-    --card-background: #{$card-background};
-    --border-radius: #{$border-radius};
-}
-
-// 🌙 Dark Mode aktivieren
-[data-theme="dark"] {
-    --primary-color: #{$dark-primary-color};
-    --secondary-color: #{$dark-secondary-color};
-    --success-color: #{$dark-success-color};
-    --error-color: #{$dark-error-color};
-    --background-color: #{$dark-background-color};
-    --text-color: #{$dark-text-color};
-    --card-background: #{$dark-card-background};
-}
-
-// ✨ Buttons & Elemente stylen
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: "Arial", sans-serif;
-}
-
-.card {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    padding: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-button {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 10px 16px;
-    border-radius: var(--border-radius);
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-button:hover {
-    filter: brightness(90%); // 90% dunkler
-}
+// 4️⃣ Basis-Layout-Styles
+@import "layout/base";

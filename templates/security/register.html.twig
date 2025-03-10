@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registrierung!{% endblock %}
+
+{% block navigation %}
+{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center">
+        <div class="card p-4 shadow-lg" style="max-width: 400px; width: 100%;">
+            <h2 class="text-center">Registrierung</h2>
+
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            {{ form_end(form) }}
+
+            <a href="{{ path('app_login') }}" class="d-block text-center mt-3">Zum Login</a>
+        </div>
+    </div>
+{% endblock %}
