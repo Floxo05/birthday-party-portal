@@ -2,41 +2,41 @@
 
 declare(strict_types=1);
 
-namespace App\Repository\PartyPackage;
+namespace App\Repository;
 
-use App\Entity\PartyPackage\Party;
+use App\Entity\Host;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Party>
+ * @extends ServiceEntityRepository<\App\Entity\Host>
  */
-class PartyRepository extends ServiceEntityRepository
+class HostRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Party::class);
+        parent::__construct($registry, Host::class);
     }
 
     //    /**
-    //     * @return Party[] Returns an array of Party objects
+    //     * @return Host[] Returns an array of Host objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
+    //        return $this->createQueryBuilder('h')
+    //            ->andWhere('h.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
+    //            ->orderBy('h.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Party
+    //    public function findOneBySomeField($value): ?Host
     //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
+    //        return $this->createQueryBuilder('h')
+    //            ->andWhere('h.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

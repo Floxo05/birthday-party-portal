@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Trait;
 
-use App\Entity\PartyPackage\Party;
+use App\Entity\Party;
 
 trait PartyTrait
 {

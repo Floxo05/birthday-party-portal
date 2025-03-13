@@ -3,13 +3,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\PartyPackage;
 
-use App\Entity\PartyPackage\Host;
-use App\Entity\PartyPackage\PartyMember;
+use App\Entity\Host;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Integration\Trait\PartyTrait;
 use App\Tests\Integration\Trait\UserTrait;
-use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class HostTest extends DatabaseTestCase

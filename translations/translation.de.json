@@ -1,0 +1,19 @@
+{
+  "admin": {
+    "party": {
+      "crud": {
+        "field": {
+          "title": "Titel",
+          "date": "Datum"
+        }
+      }
+    }
+  },
+  "user": {
+    "form": {
+      "username": {
+        "label": "Benutzername"
+      }
+    }
+  }
+}

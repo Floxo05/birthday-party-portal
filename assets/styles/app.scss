@@ -1,0 +1,15 @@
+// 1️⃣ Bootstrap importieren
+@import "~bootstrap/scss/bootstrap";
+
+// 2️⃣ Unsere Variablen laden
+@import "abstracts/variables";
+@import "abstracts/variables-dark";
+
+// 3️⃣ Komponentenspezifische SCSS-Dateien
+@import "components/buttons";
+@import "components/navbar";
+@import "components/forms";
+@import "components/cards";
+
+// 4️⃣ Basis-Layout-Styles
+@import "layout/base";

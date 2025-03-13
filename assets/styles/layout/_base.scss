@@ -1,0 +1,14 @@
+@import "../abstracts/variables";
+@import "../abstracts/variables-dark";
+
+body {
+  font-family: "Arial", sans-serif;
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  transition: background 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
