@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace App\EventSubscriber\Admin\PartyPackage;
 
-use App\Entity\PartyPackage\Host;
-use App\Entity\PartyPackage\Party;
-use App\Entity\UserPackage\User;
+use App\Entity\Host;
+use App\Entity\Party;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
 use Symfony\Bundle\SecurityBundle\Security;

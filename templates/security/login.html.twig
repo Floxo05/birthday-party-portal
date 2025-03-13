@@ -16,9 +16,11 @@
 
             {{ form_start(form) }}
             {{ form_widget(form) }}
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
             {{ form_end(form) }}
 
-{#            <a href="{{ path('register') }}" class="d-block text-center mt-3">Noch kein Account? Registrieren</a>#}
+            {#            <a href="{{ path('register') }}" class="d-block text-center mt-3">Noch kein Account? Registrieren</a> #}
         </div>
     </div>
 {% endblock %}

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controller\UserPackage;
+namespace App\Controller;
 
-use App\Entity\UserPackage\User;
+use App\Entity\User;
 use App\Form\UserPackage\LoginFormType;
 use App\Form\UserPackage\RegisterFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,9 +18,9 @@ class SecurityController extends AbstractController
     #[Route(path: '/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // if ($this->getUser()) {
-        //     return $this->redirectToRoute('target_path');
-        // }
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_home');
+        }
 
         $loginForm = $this->createForm(LoginFormType::class);
 
@@ -29,7 +29,10 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error, 'form' => $loginForm->createView()]);
+        return $this->render(
+            'security/login.html.twig',
+            ['last_username' => $lastUsername, 'error' => $error, 'form' => $loginForm->createView()]
+        );
     }
 
     #[Route(path: '/logout', name: 'app_logout')]
@@ -45,7 +48,7 @@ class SecurityController extends AbstractController
         $form = $this->createForm(RegisterFormType::class, $user);
 
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && is_string($form->get('password')->getData())) {
             $user->setPassword($hasher->hashPassword($user, $form->get('password')->getData()));
             $em->persist($user);
             $em->flush();
