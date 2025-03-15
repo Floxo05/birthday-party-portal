@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PartyRepository::class)]
 class Party
@@ -23,20 +24,36 @@ class Party
     private ?Uuid $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank]
+    #[Assert\GreaterThan('today')]
     private ?\DateTimeInterface $partyDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $title = null;
 
     /**
      * @var Collection<int, PartyMember>
      */
-    #[ORM\OneToMany(targetEntity: PartyMember::class, mappedBy: 'party')]
+    #[ORM\OneToMany(targetEntity: PartyMember::class, mappedBy: 'party', cascade: [
+        'persist',
+        'remove'
+    ], orphanRemoval: true)]
     private Collection $partyMembers;
+
+    /**
+     * @var Collection<int, Invitation>
+     */
+    #[ORM\OneToMany(targetEntity: Invitation::class, mappedBy: 'party', cascade: [
+        'persist',
+        'remove'
+    ], orphanRemoval: true)]
+    private Collection $invitations;
 
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
+        $this->invitations = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -88,13 +105,55 @@ class Party
 
     public function removePartyMember(PartyMember $partyMember): static
     {
-        if ($this->partyMembers->removeElement($partyMember)) {
+        if ($this->partyMembers->removeElement($partyMember))
+        {
             // set the owning side to null (unless already changed)
-            if ($partyMember->getParty() === $this) {
+            if ($partyMember->getParty() === $this)
+            {
                 $partyMember->setParty(null);
             }
         }
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Invitation>
+     */
+    public function getInvitations(): Collection
+    {
+        return $this->invitations;
+    }
+
+    public function addInvitation(Invitation $invitation): static
+    {
+        if (!$this->invitations->contains($invitation))
+        {
+            $this->invitations->add($invitation);
+            $invitation->setParty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInvitation(Invitation $invitation): static
+    {
+        if ($this->invitations->removeElement($invitation))
+        {
+            // set the owning side to null (unless already changed)
+            if ($invitation->getParty() === $this)
+            {
+                $invitation->setParty(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->title ?? '';
+    }
+
+
 }
