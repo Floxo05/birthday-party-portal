@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block nav_wrapper %}
+{% endblock %}
+
+{% block body %}
+    <div class="flyout-container">
+        <h2>Einladung für "{{ party.title }}" erstellen</h2>
+
+        <form id="invitation-form" action="{{ path('admin_invitation_flyout', { partyId: party.id }) }}" method="post">
+            {{ form_start(form, { attr: { id: 'invitationForm' } }) }}
+            <div class="form-group">
+                {{ form_label(form.role) }}
+                {{ form_widget(form.role, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.maxUses) }}
+                {{ form_widget(form.maxUses, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.expiresAt) }}
+                {{ form_widget(form.expiresAt, {'attr': {'class': 'form-control', 'type': 'date'}}) }}
+            </div>
+
+            {{ form_end(form) }}
+        </form>
+
+        <div id="invitation-link" class="alert alert-success mt-3" style="display: none;">
+            <p>✅ Einladung erfolgreich erstellt!</p>
+
+            <!-- Link anzeigen -->
+            <a id="invite-url" href="#" target="_blank"></a>
+
+            <!-- Button zum Kopieren oder Teilen -->
+            <div class="mt-2">
+                <button id="copy-link-btn" class="btn btn-outline-primary">📋 Link kopieren</button>
+                <button id="share-link-btn" class="btn btn-outline-secondary" style="display: none;">📲 Teilen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('invitation-form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            let formData = new FormData(this);
+
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let inviteUrl = data.inviteUrl;
+
+                        // Link anzeigen
+                        document.getElementById('invitation-form').style.display = 'none';
+                        document.getElementById('invitation-link').style.display = 'block';
+                        let inviteLinkElement = document.getElementById('invite-url');
+                        inviteLinkElement.href = inviteUrl;
+                        inviteLinkElement.textContent = inviteUrl;
+
+                        // Kopieren-Funktion
+                        let copyBtn = document.getElementById('copy-link-btn');
+                        copyBtn.addEventListener('click', function () {
+                            navigator.clipboard.writeText(inviteUrl).then(() => {
+                                alert('✅ Link wurde in die Zwischenablage kopiert!');
+                            }).catch(err => console.error('Fehler beim Kopieren', err));
+                        });
+
+                        // Teilen-Funktion (nur wenn unterstützt)
+                        let shareBtn = document.getElementById('share-link-btn');
+                        if (navigator.share) {
+                            shareBtn.style.display = 'inline-block';
+                            shareBtn.addEventListener('click', function () {
+                                navigator.share({
+                                    title: 'Party-Einladung',
+                                    text: 'Hier ist dein Einladungscode zur Party!',
+                                    url: inviteUrl
+                                }).catch(err => console.error('Fehler beim Teilen', err));
+                            });
+                        }
+                    } else {
+                        alert('⚠ Fehler: ' + (data.error || 'Unbekannt'));
+                    }
+                });
+        });
+    </script>
+{% endblock %}

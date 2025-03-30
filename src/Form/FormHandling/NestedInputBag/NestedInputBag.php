@@ -8,6 +8,11 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 class NestedInputBag extends ParameterBag
 {
+    /**
+     * @param string $key
+     * @param array<string, mixed> $default
+     * @return array<string, mixed>
+     */
     public function getArray(string $key, array $default = []): array
     {
         $val = $this->getNestedValue($this->parameters, $key);
@@ -17,7 +22,7 @@ class NestedInputBag extends ParameterBag
     /**
      * accepts keys in the format "key1.key2..."
      *
-     * @param array $data
+     * @param array<string, mixed> $data
      * @param string $key
      * @return mixed
      */
