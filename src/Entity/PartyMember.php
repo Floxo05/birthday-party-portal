@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\PartyMemberRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 
-#[ORM\Entity(repositoryClass: null)]
+#[ORM\Entity(repositoryClass: PartyMemberRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'discr', type: 'string')]
-#[ORM\DiscriminatorMap(['host' => 'Host', 'guest' => 'Guest'])]
+#[ORM\DiscriminatorMap(['host' => PartyMember::ROLE_HOST, 'guest' => PartyMember::ROLE_GUEST])]
 abstract class PartyMember
 {
+    const ROLE_HOST = 'Host';
+    const ROLE_GUEST = 'Guest';
+
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -56,4 +60,6 @@ abstract class PartyMember
 
         return $this;
     }
+
+    abstract public function getRole(): string;
 }

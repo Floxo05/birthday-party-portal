@@ -1,0 +1,18 @@
+{
+  "party": {
+    "crud": {
+      "field": {
+        "title": "Titel",
+        "date": "Datum",
+        "invitations": "Einladungen"
+      }
+    },
+    "roles": {
+      "host": "Gastgeber",
+      "guest": "Gast"
+    }
+  },
+  "invitation": {
+    "message": "%role%-Einladung zur Party \"%party%\" am %date%"
+  }
+}
