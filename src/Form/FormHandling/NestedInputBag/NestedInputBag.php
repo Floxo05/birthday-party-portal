@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Form\FormHandling\NestedInputBag;
 
+use Override;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class NestedInputBag extends ParameterBag
@@ -38,6 +39,7 @@ class NestedInputBag extends ParameterBag
         return $data;
     }
 
+    #[Override]
     public function get(string $key, mixed $default = null): mixed
     {
         return $this->getNestedValue($this->parameters, $key) ?? $default;

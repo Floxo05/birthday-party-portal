@@ -14,7 +14,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PartyRepository::class)]
-class Party
+class Party implements \Stringable
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]

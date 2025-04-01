@@ -85,7 +85,8 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "unit": "vendor/bin/phpunit --testsuite Unit"
     },
     "conflict": {
         "symfony/symfony": "*"

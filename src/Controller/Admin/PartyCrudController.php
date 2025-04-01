@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Party;
@@ -20,6 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Override;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -41,6 +44,7 @@ class PartyCrudController extends AbstractCrudController
     }
 
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         $adminUrlGenerator = $this->adminUrlGenerator;
@@ -109,6 +113,7 @@ class PartyCrudController extends AbstractCrudController
             });
     }
 
+    #[Override]
     protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
     {
         return $this->redirect(
@@ -118,6 +123,7 @@ class PartyCrudController extends AbstractCrudController
         );
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         $createInvitation = Action::new('createInvitation', 'Einladung erstellen')
@@ -133,6 +139,7 @@ class PartyCrudController extends AbstractCrudController
             ;
     }
 
+    #[Override]
     public function createIndexQueryBuilder(
         SearchDto $searchDto,
         EntityDto $entityDto,
