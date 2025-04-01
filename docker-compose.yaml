@@ -7,10 +7,12 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/app
+      - ./qa/reports/coverage:/app/coverage-report
     depends_on:
       - db
     environment:
       DATABASE_URL: mysql://app:password@db:3307/app
+      XDEBUG_MODE: coverage
     command: php -S 0.0.0.0:8001 -t public
     ports:
       - "8001:8001"
