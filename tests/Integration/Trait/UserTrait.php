@@ -16,7 +16,8 @@ trait UserTrait
         $user = new User();
         $user
             ->setPassword($hasher->hashPassword($user, 'password'))
-            ->setUsername('testuser' . random_int(1, 1000));
+            ->setUsername('testuser' . random_int(1, 1000))
+            ->setName('testuser' . random_int(1, 1000));
 
         return $user;
     }

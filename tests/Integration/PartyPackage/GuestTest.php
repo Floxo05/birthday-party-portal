@@ -14,6 +14,9 @@ class GuestTest extends DatabaseTestCase
     use UserTrait;
     use PartyTrait;
 
+    /**
+     * @throws \Exception
+     */
     public function testCreatePartyMember(): void
     {
         $hasher = $this->getContainer()->get(UserPasswordHasherInterface::class);

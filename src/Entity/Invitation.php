@@ -38,7 +38,7 @@ class Invitation
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column]
-    #[Assert\Expression('this.maxUses > this.uses')]
+    #[Assert\Expression('this.getMaxUses() > this.getUses()')]
     private ?int $maxUses = null;
 
     #[ORM\Column]
