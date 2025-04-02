@@ -1,6 +1,0 @@
-doctrine:
-  dbal:
-    connections:
-      default:
-        driver: 'pdo_sqlite'
-        url: 'sqlite:///:memory:'

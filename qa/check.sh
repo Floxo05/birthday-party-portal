@@ -33,7 +33,7 @@ run_step() {
 }
 
 # ✍️ Hier einfach neue Step-Namen eintragen
-steps=("composer" "phpstan" "coverage-unit" "coverage-integration" "audit")
+steps=("composer" "phpstan" "coverage-unit" "coverage-integration" "coverage-feature" "audit")
 
 # Schrittweise ausführen
 for step in "${steps[@]}"; do

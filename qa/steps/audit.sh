@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose run --rm app composer audit
+XDEBUG_MODE=off composer audit

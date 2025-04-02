@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose run --rm app composer install --no-interaction
+XDEBUG_MODE=off composer install --no-interaction

@@ -4,12 +4,13 @@ MIN_COVERAGE=50
 
 echo "📈 Running Unit-Test coverage only..."
 
-output=$(docker compose run --rm \
-    -e XDEBUG_MODE=coverage \
-    app ./vendor/bin/phpunit \
+export XDEBUG_MODE=coverage
+
+
+output=$(./vendor/bin/phpunit \
     --testsuite Unit \
     --coverage-text \
-    --coverage-html=coverage-report/unit)
+    --coverage-html=qa/reports/code-coverage)
 
 echo "$output"
 
