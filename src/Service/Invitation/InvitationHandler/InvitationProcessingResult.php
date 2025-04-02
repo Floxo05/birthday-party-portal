@@ -6,12 +6,12 @@ namespace App\Service\Invitation\InvitationHandler;
 
 use App\Entity\Invitation;
 
-class InvitationProcessingResult
+readonly class InvitationProcessingResult
 {
 
     public function __construct(
-        private readonly bool $userJoined,
-        private readonly Invitation $invitation,
+        private bool $userJoined,
+        private Invitation $invitation,
     ) {
     }
 

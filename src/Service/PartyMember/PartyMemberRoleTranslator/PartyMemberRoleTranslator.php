@@ -7,11 +7,11 @@ namespace App\Service\PartyMember\PartyMemberRoleTranslator;
 use App\Entity\PartyMember;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PartyMemberRoleTranslator implements PartyMemberRoleTranslatorInterface
+readonly class PartyMemberRoleTranslator implements PartyMemberRoleTranslatorInterface
 {
 
     public function __construct(
-        private readonly TranslatorInterface $translator
+        private TranslatorInterface $translator
     ) {
     }
 

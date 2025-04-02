@@ -10,7 +10,7 @@ use App\Entity\PartyMember;
 
 interface PartyMemberFactoryInterface
 {
-    public const ROLE_CLASS_MAP = [
+    public const array ROLE_CLASS_MAP = [
         PartyMember::ROLE_GUEST => Guest::class,
         PartyMember::ROLE_HOST => Host::class,
     ];
