@@ -8,13 +8,13 @@ use App\Entity\Invitation;
 use App\Service\PartyMember\PartyMemberRoleTranslator\PartyMemberRoleTranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InvitationTranslator implements InvitationToStringTranslatorInterface
+readonly class InvitationTranslator implements InvitationToStringTranslatorInterface
 {
 
 
     public function __construct(
-        private readonly PartyMemberRoleTranslatorInterface $roleTranslator,
-        private readonly TranslatorInterface $translator
+        private PartyMemberRoleTranslatorInterface $roleTranslator,
+        private TranslatorInterface $translator
     ) {
     }
 

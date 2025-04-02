@@ -8,5 +8,10 @@ use App\Entity\Invitation;
 
 interface InvitationLinkGeneratorInterface
 {
+    /**
+     * @param Invitation $invitation
+     * @return string
+     * @throws \LogicException
+     */
     public function generate(Invitation $invitation): string;
 }
