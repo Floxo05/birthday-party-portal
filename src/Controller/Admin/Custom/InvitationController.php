@@ -33,7 +33,7 @@ class InvitationController extends AbstractController
         $party = $entityManager->getRepository(Party::class)->find($partyId);
         if (!$party)
         {
-            return new JsonResponse(['error' => 'Party nicht gefunden.'], 404);
+            return new JsonResponse(['error' => 'Party nicht gefunden.'], Response::HTTP_NOT_FOUND);
         }
 
         $form = $this->createForm(InvitationFormType::class, null, ['party' => $party]);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Admin;
 
 use App\Entity\Invitation;
@@ -11,16 +13,19 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Override;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
 class DashboardController extends AbstractDashboardController
 {
+    #[Override]
     public function index(): Response
     {
         return $this->render('admin/welcome.html.twig');
     }
 
+    #[Override]
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
@@ -28,6 +33,7 @@ class DashboardController extends AbstractDashboardController
             ->setTranslationDomain('admin');
     }
 
+    #[Override]
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
@@ -36,6 +42,7 @@ class DashboardController extends AbstractDashboardController
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
     }
 
+    #[Override]
     public function configureActions(): Actions
     {
         return parent::configureActions()
@@ -45,6 +52,7 @@ class DashboardController extends AbstractDashboardController
             ->remove(Crud::PAGE_DETAIL, Action::DELETE);
     }
 
+    #[Override]
     public function configureCrud(): Crud
     {
         return parent::configureCrud()

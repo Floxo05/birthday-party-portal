@@ -9,10 +9,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use ReflectionClass;
 use ReflectionException;
 
-class PartyMemberRoleProvider implements PartyMemberRoleProviderInterface
+readonly class PartyMemberRoleProvider implements PartyMemberRoleProviderInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager
     ) {
     }
 

@@ -6,11 +6,11 @@ namespace App\Service\Invitation\InvitationSessionManager;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class InvitationSessionManager implements InvitationSessionManagerInterface
+readonly class InvitationSessionManager implements InvitationSessionManagerInterface
 {
 
     public function __construct(
-        private readonly RequestStack $requestStack
+        private RequestStack $requestStack
     ) {
     }
 
@@ -22,7 +22,13 @@ class InvitationSessionManager implements InvitationSessionManagerInterface
     public function getInvitationToken(): ?string
     {
         $val = $this->requestStack->getSession()->get(self::INVITATION_TOKEN_KEY);
-        return is_string($val) ? $val : null;
+
+        if (!is_string($val))
+        {
+            return null;
+        }
+
+        return $val;
     }
 
     public function clearInvitationToken(): void

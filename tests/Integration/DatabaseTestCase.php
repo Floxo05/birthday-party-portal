@@ -6,9 +6,9 @@ namespace App\Tests\Integration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use LogicException;
+use Override;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DatabaseTestCase extends KernelTestCase
 {
@@ -30,6 +30,7 @@ class DatabaseTestCase extends KernelTestCase
         $schemaTool->updateSchema($metaData);
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         parent::tearDown();

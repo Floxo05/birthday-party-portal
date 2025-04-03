@@ -15,13 +15,13 @@ use App\Service\Invitation\InvitationLinkGenerator\InvitationLinkGeneratorInterf
 use App\Service\Invitation\InvitationManager\InvitationManagerInterface;
 use App\Service\PartyMember\PartyMembershipManager\PartyMembershipManagerInterface;
 
-class InvitationHandler implements InvitationHandlerInterface
+readonly class InvitationHandler implements InvitationHandlerInterface
 {
 
     public function __construct(
-        private readonly InvitationManagerInterface $invitationManager,
-        private readonly PartyMembershipManagerInterface $partyMembershipService,
-        private readonly InvitationLinkGeneratorInterface $invitationLinkGenerator
+        private InvitationManagerInterface $invitationManager,
+        private PartyMembershipManagerInterface $partyMembershipService,
+        private InvitationLinkGeneratorInterface $invitationLinkGenerator
     ) {
     }
 

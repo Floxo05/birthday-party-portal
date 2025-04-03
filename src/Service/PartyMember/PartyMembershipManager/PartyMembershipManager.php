@@ -11,13 +11,13 @@ use App\Repository\PartyMemberRepository;
 use App\Service\PartyMember\PartyMemberFactory\PartyMemberFactory;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PartyMembershipManager implements PartyMembershipManagerInterface
+readonly class PartyMembershipManager implements PartyMembershipManagerInterface
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly PartyMemberRepository $partyMemberRepository,
-        private readonly PartyMemberFactory $partyMemberFactory,
+        private EntityManagerInterface $entityManager,
+        private PartyMemberRepository $partyMemberRepository,
+        private PartyMemberFactory $partyMemberFactory,
     ) {
     }
 

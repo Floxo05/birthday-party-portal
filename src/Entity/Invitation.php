@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\InvitationRepository;
@@ -10,7 +12,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: InvitationRepository::class)]
-class Invitation
+class Invitation implements \Stringable
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -38,7 +40,7 @@ class Invitation
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column]
-    #[Assert\Expression('this.maxUses > this.uses')]
+    #[Assert\Expression('this.getMaxUses() > this.getUses()')]
     private ?int $maxUses = null;
 
     #[ORM\Column]

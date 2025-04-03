@@ -9,14 +9,16 @@ use App\Entity\Party;
 use App\Repository\InvitationRepository;
 use App\Service\Invitation\TokenGenerator\TokenGeneratorInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Clock\ClockInterface;
 
-class InvitationManager implements InvitationManagerInterface
+readonly class InvitationManager implements InvitationManagerInterface
 {
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly InvitationRepository $invitationRepository,
-        private readonly TokenGeneratorInterface $tokenGenerator,
+        private EntityManagerInterface $entityManager,
+        private InvitationRepository $invitationRepository,
+        private TokenGeneratorInterface $tokenGenerator,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -44,6 +46,16 @@ class InvitationManager implements InvitationManagerInterface
     {
         $invitation = $this->invitationRepository->findOneBy(['token' => $token]);
 
-        return ($invitation && $invitation->getExpiresAt() > new \DateTimeImmutable()) ? $invitation : null;
+        if (!$invitation)
+        {
+            return null;
+        }
+
+        if ($invitation->getExpiresAt() <= $this->clock->now())
+        {
+            return null;
+        }
+
+        return $invitation;
     }
 }

@@ -7,15 +7,25 @@ namespace App\Service\Invitation\InvitationLinkGenerator;
 use App\Entity\Invitation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class InvitationLinkGenerator implements InvitationLinkGeneratorInterface
+readonly class InvitationLinkGenerator implements InvitationLinkGeneratorInterface
 {
     public function __construct(
-        private readonly UrlGeneratorInterface $urlGenerator
+        private UrlGeneratorInterface $urlGenerator
     ) {
     }
 
+    /**
+     * @param Invitation $invitation
+     * @return string
+     * @throws \LogicException
+     */
     public function generate(Invitation $invitation): string
     {
+        if ($invitation->getToken() === null)
+        {
+            throw new \LogicException('Invitation link cannot be generated: token is null');
+        }
+
         return $this->urlGenerator->generate(
             'app_invite',
             ['token' => $invitation->getToken()],

@@ -22,6 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use Override;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -38,6 +39,7 @@ class InvitationCrudController extends AbstractCrudController
         return Invitation::class;
     }
 
+    #[Override]
     public function configureCrud(Crud $crud): Crud
     {
         return parent::configureCrud($crud)
@@ -45,6 +47,7 @@ class InvitationCrudController extends AbstractCrudController
             ->setPageTitle(Crud::PAGE_DETAIL, 'Einladungsdetails');
     }
 
+    #[Override]
     public function configureActions(Actions $actions): Actions
     {
         return parent::configureActions($actions)
@@ -52,6 +55,7 @@ class InvitationCrudController extends AbstractCrudController
             ->disable(Action::EDIT);
     }
 
+    #[Override]
     public function configureFields(string $pageName): iterable
     {
         yield AssociationField::new('party');
@@ -70,6 +74,7 @@ class InvitationCrudController extends AbstractCrudController
         }
     }
 
+    #[Override]
     public function createIndexQueryBuilder(
         SearchDto $searchDto,
         EntityDto $entityDto,
