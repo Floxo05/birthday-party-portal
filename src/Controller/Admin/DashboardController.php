@@ -6,6 +6,8 @@ namespace App\Controller\Admin;
 
 use App\Entity\Invitation;
 use App\Entity\Party;
+use App\Entity\User;
+use App\Security\Role;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -39,6 +41,8 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Party', 'fa fa-music', Party::class);
         yield MenuItem::linkToCrud('Einladung', 'fa fa-envelope-open-text', Invitation::class);
+        yield MenuItem::linkToCrud('Nutzer', 'fa fa-user', User::class)
+            ->setPermission(Role::ADMIN->value);
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
     }
 
