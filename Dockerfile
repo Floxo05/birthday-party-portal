@@ -11,13 +11,10 @@ RUN apt-get update && apt-get install -y \
 # Composer installieren
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Apache DocumentRoot auf /var/www/html/public setzen (Symfony public dir)
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-
 # Apache Konfiguration für Symfony
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf \
-    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf \
-    && echo '<Directory /var/www/html/public>\n\tAllowOverride All\n\tRequire all granted\n</Directory>' >> /etc/apache2/apache2.conf
+RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
+ && sed -ri -e 's!/var/www/!/var/www/html/public!g' /etc/apache2/apache2.conf \
+ && echo '<Directory /var/www/html/public>\n\tAllowOverride All\n\tRequire all granted\n</Directory>' >> /etc/apache2/apache2.conf
 
 # Arbeitsverzeichnis setzen
 WORKDIR /var/www/html
