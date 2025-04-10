@@ -3,3 +3,5 @@ parameters:
     paths:
         - public/
         - src/
+    excludePaths:
+        - src/Factory/
