@@ -15,7 +15,7 @@ WORKDIR /var/www
 COPY . .
 
 # Abhängigkeiten installieren
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install -n -o
 
 # Cache/Logs beschreibbar machen
 RUN chmod -R 777 var
