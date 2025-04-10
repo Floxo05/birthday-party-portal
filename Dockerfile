@@ -1,6 +1,9 @@
-FROM php:8.3-fpm
+FROM php:8.3-apache
 
-# Systemabhängigkeiten installieren
+# Apache Rewrite-Modul aktivieren
+RUN a2enmod rewrite
+
+# Systemabhängigkeiten und PHP-Erweiterungen installieren
 RUN apt-get update && apt-get install -y \
     git unzip curl libzip-dev libicu-dev zlib1g-dev libpng-dev libjpeg-dev libonig-dev libxml2-dev \
     && docker-php-ext-install intl pdo pdo_mysql zip
@@ -8,16 +11,25 @@ RUN apt-get update && apt-get install -y \
 # Composer installieren
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Apache DocumentRoot auf /var/www/html/public setzen (Symfony public dir)
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+# Apache Konfiguration für Symfony
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf \
+    && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf \
+    && echo '<Directory /var/www/html/public>\n\tAllowOverride All\n\tRequire all granted\n</Directory>' >> /etc/apache2/apache2.conf
+
 # Arbeitsverzeichnis setzen
-WORKDIR /var/www
+WORKDIR /var/www/html
 
 # App-Dateien kopieren
 COPY . .
 
-# Abhängigkeiten installieren
-RUN composer install -n -o
+# Symfony Abhängigkeiten installieren
+RUN composer install --no-interaction --optimize-autoloader
 
-# Cache/Logs beschreibbar machen
+# Schreibrechte für var/
 RUN chmod -R 777 var
 
-CMD ["php-fpm"]
+# Port freigeben (Apache nutzt Port 80 standardmäßig)
+EXPOSE 80
