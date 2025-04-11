@@ -1,0 +1,13 @@
+name: Deploy to CapRover (Staging)
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call CapRover Webhook (Staging)
+        run: curl -X POST "${{ secrets.CAPROVER_WEBHOOK_URL_STAGING }}"
