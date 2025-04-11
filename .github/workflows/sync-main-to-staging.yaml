@@ -21,8 +21,8 @@ jobs:
 
       - name: Sync main -> staging
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT_SYNC }}@github.com/${{ github.repository }}
-          git fetch origin staging
+          git remote add authed-origin https://x-access-token:${{ secrets.GH_PAT_SYNC }}@github.com/${{ github.repository }}
+          git fetch authed-origin staging
           git checkout staging
-          git merge origin/main --no-edit
-          git push origin staging
+          git merge authed-origin/main --no-edit
+          git push authed-origin staging
