@@ -23,6 +23,14 @@ jobs:
         run: |
           git remote add authed-origin https://x-access-token:${{ secrets.GH_PAT_SYNC }}@github.com/${{ github.repository }}
           git fetch authed-origin staging
-          git checkout staging
+          git fetch authed-origin main
+
+          # Erstelle lokalen staging-Branch explizit aus authed-origin
+          git checkout -b staging authed-origin/staging
+
+          # Merge main rein (aus authed-origin)
           git merge authed-origin/main --no-edit
+
+          # Push zurück zu authed-origin
           git push authed-origin staging
+      
