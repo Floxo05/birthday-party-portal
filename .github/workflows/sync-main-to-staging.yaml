@@ -20,10 +20,8 @@ jobs:
           git config user.email "actions@github.com"
 
       - name: Sync main -> staging
-        env:
-          GH_PAT: ${{ secrets.GH_PAT_SYNC }}
         run: |
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
+          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT_SYNC }}@github.com/${{ github.repository }}
           git fetch origin staging
           git checkout staging
           git merge origin/main --no-edit
