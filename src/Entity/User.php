@@ -52,6 +52,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
     #[ORM\OneToMany(targetEntity: PartyMember::class, mappedBy: 'user')]
     private Collection $partyMembers;
 
+    #[ORM\OneToOne(mappedBy: 'uploader', cascade: ['persist', 'remove'])]
+    private ?Media $media = null;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
@@ -185,5 +188,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
         }
 
         return $this->id && $user->getId() && $this->id->equals($user->getId());
+    }
+
+    public function getMedia(): ?Media
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?Media $media): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($media === null && $this->media !== null)
+        {
+            $this->media->setUploader(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($media !== null && $media->getUploader() !== $this)
+        {
+            $media->setUploader($this);
+        }
+
+        $this->media = $media;
+
+        return $this;
     }
 }
