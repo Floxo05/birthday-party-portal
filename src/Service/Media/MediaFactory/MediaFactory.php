@@ -20,7 +20,7 @@ class MediaFactory implements MediaFactoryInterface
         $media->setUploader($user);
         $media->setOriginalFilename($file->getClientOriginalName());
         $media->setMimeType($file->getMimeType() ?? 'application/octet-stream');
-        $media->setSize($file->getSize() ?? 0);
+        $media->setSize($file->getSize() ?: 0);
         $media->setStoragePath($storagePath);
         $media->setUploadedAt(new \DateTimeImmutable());
 

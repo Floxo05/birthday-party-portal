@@ -9,6 +9,9 @@ use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
+/**
+ * @extends Voter<string, Media>
+ */
 class MediaVoter extends Voter
 {
     protected function supports(string $attribute, mixed $subject): bool
@@ -30,7 +33,7 @@ class MediaVoter extends Voter
 
         $party = $subject->getParty();
 
-        foreach ($party?->getPartyMembers() as $member)
+        foreach ($party?->getPartyMembers() ?? [] as $member)
         {
             if ($member->getUser() === $user)
             {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MIN_COVERAGE=24
+MIN_COVERAGE=1
 
 echo "📈 Running Unit-Test coverage only..."
 

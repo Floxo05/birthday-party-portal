@@ -7,6 +7,7 @@ namespace App\Service\Media\MediaStorage;
 use App\Entity\Party;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Uid\Uuid;
 
@@ -29,6 +30,10 @@ readonly class MediaStorage implements MediaStorageInterface
     public function store(UploadedFile $file, string $path): void
     {
         $stream = fopen($file->getPathname(), 'r');
+        if ($stream === false)
+        {
+            throw new FileException('Unable to open file.');
+        }
         $this->mediaStorage->writeStream($path, $stream);
         fclose($stream);
     }

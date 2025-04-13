@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use Override;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -77,27 +78,33 @@ class MediaCrudController extends AbstractCrudController
             ->setUploadDir('public') // just as placeholder; real dir is configured in upload_new
             ->setFormTypeOption('upload_new', function (UploadedFile $file) use ($context)
             {
-                /** @var Media $media */
+                /** @var Media|null $media */
                 $media = $context->getEntity()->getInstance();
                 if ($media === null)
                 {
-                    throw new \RuntimeException('Media must be set');
+                    throw new \UnexpectedValueException('Media must be set');
+                }
+
+                $party = $media->getParty();
+                if ($party === null)
+                {
+                    throw new \UnexpectedValueException('Party must be set');
                 }
 
                 $user = $this->getUser();
                 if (!$user instanceof User)
                 {
-                    throw new \RuntimeException('User must be set');
+                    throw new \UnexpectedValueException('User must be set');
                 }
 
-                $path = $this->mediaStorage->getStoragePath($file, $media->getParty());
+                $path = $this->mediaStorage->getStoragePath($file, $party);
 
                 $this->mediaStorage->store($file, $path);
 
                 $media->setStoragePath($path);
                 $media->setOriginalFilename($file->getClientOriginalName());
                 $media->setMimeType($file->getMimeType() ?? 'application/octet-stream');
-                $media->setSize($file->getSize() ?? 0);
+                $media->setSize($file->getSize() ?: 0);
                 $media->setUploadedAt(new \DateTimeImmutable());
                 $media->setUploader($user);
             })

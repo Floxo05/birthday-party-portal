@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Media;
+use http\Exception\UnexpectedValueException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,6 +20,11 @@ final class MediaController extends AbstractController
     public function view(Media $media, FilesystemOperator $mediaStorage): Response
     {
         $this->denyAccessUnlessGranted('view', $media);
+
+        if ($media->getStoragePath() === null)
+        {
+            throw new UnexpectedValueException('Expected media to have a storage path, but got null.');
+        }
 
         if (!$mediaStorage->fileExists($media->getStoragePath()))
         {
@@ -46,6 +52,11 @@ final class MediaController extends AbstractController
     public function download(Media $media, FilesystemOperator $mediaStorage): Response
     {
         $this->denyAccessUnlessGranted('view', $media);
+
+        if ($media->getStoragePath() === null)
+        {
+            throw new UnexpectedValueException('Expected media to have a storage path, but got null.');
+        }
 
         if (!$mediaStorage->fileExists($media->getStoragePath()))
         {
