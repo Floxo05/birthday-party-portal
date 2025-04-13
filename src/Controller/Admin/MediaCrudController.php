@@ -5,13 +5,17 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Service\Media\MediaStorage\MediaStorage;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MediaCrudController extends AbstractCrudController
@@ -20,6 +24,7 @@ class MediaCrudController extends AbstractCrudController
 
     public function __construct(
         private readonly MediaStorage $mediaStorage,
+        private readonly AdminUrlGenerator $adminUrlGenerator,
     ) {
     }
 
@@ -46,7 +51,7 @@ class MediaCrudController extends AbstractCrudController
                     return $value;
                 }
 
-                $url = $this->generateUrl('app_media_download', [
+                $url = $this->generateUrl('app_media_view', [
                     'id' => $entity->getId(),
                 ], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -55,21 +60,21 @@ class MediaCrudController extends AbstractCrudController
             ->hideOnForm()
             ->renderAsHtml();
 
-        yield TextField::new('mimeType')
+        yield TextField::new('mimeType', 'Mime Typ')
             ->hideOnForm();
-        yield IntegerField::new('size')
-            ->hideOnForm();
-        yield DateField::new('uploadedAt')
+        yield IntegerField::new('size', 'Größe in MiB')
+            ->hideOnForm()
+            ->formatValue(fn(int $size) => round($size / (1024 * 1024), 2));;
+        yield DateField::new('uploadedAt', 'Hochgeladen am')
             ->hideOnForm();
 
         yield AssociationField::new('party')
             ->setRequired(true);
-        yield AssociationField::new('uploader')->hideOnForm();
+        yield AssociationField::new('uploader', 'Hochgeladen von')->hideOnForm();
 
-        yield TextField::new('storagePath')
+        yield ImageField::new('storagePath')
             ->setLabel('Datei hochladen')
-            ->setFormType(FileUploadType::class)
-            ->setFormTypeOption('upload_dir', 'media')
+            ->setUploadDir('public') // just as placeholder; real dir is configured in upload_new
             ->setFormTypeOption('upload_new', function (UploadedFile $file) use ($context)
             {
                 /** @var Media $media */
@@ -96,6 +101,17 @@ class MediaCrudController extends AbstractCrudController
                 $media->setUploadedAt(new \DateTimeImmutable());
                 $media->setUploader($user);
             })
+            ->setFileConstraints([])
             ->onlyOnForms();
+    }
+
+    #[Override]
+    protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
+    {
+        return $this->redirect(
+            $this->adminUrlGenerator->setAction(Action::INDEX)
+                ->setEntityId($context->getEntity()->getPrimaryKeyValue())
+                ->generateUrl()
+        );
     }
 }

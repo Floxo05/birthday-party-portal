@@ -15,17 +15,14 @@ final class MediaController extends AbstractController
     /**
      * @throws FilesystemException
      */
-    #[Route('/media/{id}', name: 'app_media_download', requirements: ['id' => '[0-9a-fA-F\-]{36}'])]
-    public function serve(
-        Media $media,
-        FilesystemOperator $mediaStorage
-    ): Response {
+    #[Route('/media/view/{id}', name: 'app_media_view')]
+    public function view(Media $media, FilesystemOperator $mediaStorage): Response
+    {
         $this->denyAccessUnlessGranted('view', $media);
-
 
         if (!$mediaStorage->fileExists($media->getStoragePath()))
         {
-            throw $this->createNotFoundException('Datei nicht gefunden.');
+            throw $this->createNotFoundException();
         }
 
         $stream = $mediaStorage->readStream($media->getStoragePath());
@@ -37,6 +34,34 @@ final class MediaController extends AbstractController
         }, 200, [
             'Content-Type' => $media->getMimeType(),
             'Content-Disposition' => 'inline; filename="' . $media->getOriginalFilename() . '"',
+            'Content-Length' => $media->getSize(),
+            'Accept-Ranges' => 'bytes',
+        ]);
+    }
+
+    /**
+     * @throws FilesystemException
+     */
+    #[Route('/media/download/{id}', name: 'app_media_download')]
+    public function download(Media $media, FilesystemOperator $mediaStorage): Response
+    {
+        $this->denyAccessUnlessGranted('view', $media);
+
+        if (!$mediaStorage->fileExists($media->getStoragePath()))
+        {
+            throw $this->createNotFoundException();
+        }
+
+        $stream = $mediaStorage->readStream($media->getStoragePath());
+
+        return new StreamedResponse(function () use ($stream)
+        {
+            fpassthru($stream);
+            fclose($stream);
+        }, 200, [
+            'Content-Type' => $media->getMimeType(),
+            'Content-Disposition' => 'attachment; filename="' . $media->getOriginalFilename() . '"',
+            'Content-Length' => $media->getSize(),
         ]);
     }
 }
