@@ -52,12 +52,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
     #[ORM\OneToMany(targetEntity: PartyMember::class, mappedBy: 'user')]
     private Collection $partyMembers;
 
-    #[ORM\OneToOne(mappedBy: 'uploader', cascade: ['persist', 'remove'])]
-    private ?Media $media = null;
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
+    private Collection $media;
 
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -190,26 +194,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
         return $this->id && $user->getId() && $this->id->equals($user->getId());
     }
 
-    public function getMedia(): ?Media
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
     {
         return $this->media;
     }
 
-    public function setMedia(?Media $media): static
+    public function addMedium(Media $medium): static
     {
-        // unset the owning side of the relation if necessary
-        if ($media === null && $this->media !== null)
+        if (!$this->media->contains($medium))
         {
-            $this->media->setUploader(null);
+            $this->media->add($medium);
+            $medium->setUploader($this);
         }
 
-        // set the owning side of the relation if necessary
-        if ($media !== null && $media->getUploader() !== $this)
-        {
-            $media->setUploader($this);
-        }
+        return $this;
+    }
 
-        $this->media = $media;
+    public function removeMedium(Media $medium): static
+    {
+        if ($this->media->removeElement($medium))
+        {
+            // set the owning side to null (unless already changed)
+            if ($medium->getUploader() === $this)
+            {
+                $medium->setUploader(null);
+            }
+        }
 
         return $this;
     }

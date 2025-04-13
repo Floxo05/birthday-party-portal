@@ -4,19 +4,23 @@ namespace App\Entity;
 
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    // @phpstan-ignore-next-line
+    private ?Uuid $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
     private ?Party $party = null;
 
-    #[ORM\OneToOne(inversedBy: 'media', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'media')]
     private ?User $uploader = null;
 
     #[ORM\Column(length: 255)]
@@ -34,7 +38,7 @@ class Media
     #[ORM\Column]
     private ?\DateTimeImmutable $uploadedAt = null;
 
-    public function getId(): ?int
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

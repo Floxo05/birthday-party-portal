@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class MediaCrudController extends AbstractCrudController
 {
@@ -37,7 +38,22 @@ class MediaCrudController extends AbstractCrudController
         }
 
         yield TextField::new('originalFilename')
-            ->hideOnForm();
+            ->setLabel('Datei')
+            ->formatValue(function ($value, $entity)
+            {
+                if (!$entity instanceof Media)
+                {
+                    return $value;
+                }
+
+                $url = $this->generateUrl('app_media_download', [
+                    'id' => $entity->getId(),
+                ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+                return sprintf('<a href="%s" target="_blank">%s</a>', $url, htmlspecialchars($value));
+            })
+            ->hideOnForm()
+            ->renderAsHtml();
 
         yield TextField::new('mimeType')
             ->hideOnForm();
