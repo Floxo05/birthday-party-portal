@@ -1,5 +1,5 @@
 # 1. STAGE: Assets bauen
-FROM node:20-slim as frontend-build
+FROM node:20-slim AS frontend-build
 
 WORKDIR /app
 
@@ -26,6 +26,8 @@ RUN apt-get update && apt-get install -y \
 
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+COPY docker/php/custom-php.ini /usr/local/etc/php/conf.d/zz-upload-limit.ini
 
 # Apache für Symfony vorbereiten
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
