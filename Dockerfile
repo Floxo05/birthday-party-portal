@@ -40,7 +40,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # Composer install (prod only)
-RUN composer install --optimize-autoloader --no-interaction
+RUN composer install --optimize-autoloader --no-interaction --ignore-platform-req=ext-http
 
 # Assets aus erster Stage übernehmen
 COPY --from=frontend-build /app/public/build public/build
