@@ -50,10 +50,17 @@ class Party implements \Stringable
     ], orphanRemoval: true)]
     private Collection $invitations;
 
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'party')]
+    private Collection $media;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
         $this->invitations = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -153,6 +160,39 @@ class Party implements \Stringable
     public function __toString(): string
     {
         return $this->title ?? '';
+    }
+
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedium(Media $medium): static
+    {
+        if (!$this->media->contains($medium))
+        {
+            $this->media->add($medium);
+            $medium->setParty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedium(Media $medium): static
+    {
+        if ($this->media->removeElement($medium))
+        {
+            // set the owning side to null (unless already changed)
+            if ($medium->getParty() === $this)
+            {
+                $medium->setParty(null);
+            }
+        }
+
+        return $this;
     }
 
 
