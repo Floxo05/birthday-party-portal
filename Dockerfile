@@ -46,7 +46,7 @@ RUN composer install --optimize-autoloader --no-interaction --ignore-platform-re
 COPY --from=frontend-build /app/public/build public/build
 
 # Berechtigungen & Start
-RUN chmod -R 777 var
+RUN chown -R www-data:www-data var public
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
