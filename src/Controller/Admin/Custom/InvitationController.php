@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Custom;
 
 use App\Controller\Admin\InvitationCrudController;
-use App\DTO\Admin\InvitationDataDTO;
 use App\Entity\Party;
 use App\Form\Admin\InvitationFormType;
+use App\Form\Model\InvitationFormModel;
 use App\Service\Invitation\InvitationHandler\InvitationHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -39,9 +39,29 @@ class InvitationController extends AbstractController
         $form = $this->createForm(InvitationFormType::class, null, ['party' => $party]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
+        if ($form->isSubmitted())
         {
-            /** @var InvitationDataDTO $data */
+            if (!$form->isValid())
+            {
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $formField = $error->getOrigin(); // Das Feld, an dem der Fehler auftrat
+                    $fieldName = $formField->getPropertyPath(); // Pfadname wie "product[price]"
+                    $message = $error->getMessage();
+                    $errors[] = sprintf('%s: %s', $fieldName, $message);
+                }
+
+                $errorAsString = implode("\n", $errors);
+                return $this->json(
+                    [
+                        'success' => false,
+                        'error' => $errorAsString
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            /** @var InvitationFormModel $data */
             $data = $form->getData();
             $invitation = $this->invitationHandler->createInvitation(
                 $party,

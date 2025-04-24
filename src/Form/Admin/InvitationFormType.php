@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Form\Admin;
 
-use App\DTO\Admin\InvitationDataDTO;
 use App\Entity\Party;
 use App\Entity\PartyMember;
+use App\Form\Model\InvitationFormModel;
 use App\Service\PartyMember\PartyMemberRoleTranslator\PartyMemberRoleTranslatorInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class InvitationFormType extends AbstractType
@@ -62,7 +63,7 @@ class InvitationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'party' => null,
-            'data_class' => InvitationDataDTO::class
+            'data_class' => InvitationFormModel::class
         ]);
     }
 }

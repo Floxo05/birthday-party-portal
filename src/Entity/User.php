@@ -52,9 +52,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
     #[ORM\OneToMany(targetEntity: PartyMember::class, mappedBy: 'user')]
     private Collection $partyMembers;
 
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
+    private Collection $media;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
+        $this->media = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -185,5 +192,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
         }
 
         return $this->id && $user->getId() && $this->id->equals($user->getId());
+    }
+
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedium(Media $medium): static
+    {
+        if (!$this->media->contains($medium))
+        {
+            $this->media->add($medium);
+            $medium->setUploader($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedium(Media $medium): static
+    {
+        if ($this->media->removeElement($medium))
+        {
+            // set the owning side to null (unless already changed)
+            if ($medium->getUploader() === $this)
+            {
+                $medium->setUploader(null);
+            }
+        }
+
+        return $this;
     }
 }

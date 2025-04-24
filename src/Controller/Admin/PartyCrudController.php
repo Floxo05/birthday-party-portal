@@ -47,8 +47,6 @@ class PartyCrudController extends AbstractCrudController
     #[Override]
     public function configureFields(string $pageName): iterable
     {
-        $adminUrlGenerator = $this->adminUrlGenerator;
-
         yield TextField::new('title', 'party.crud.field.title');
         yield DateField::new('partyDate', 'party.crud.field.date');
         yield CollectionField::new('invitations', 'party.crud.field.invitations')
