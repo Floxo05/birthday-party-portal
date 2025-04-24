@@ -1,13 +1,16 @@
 framework:
-    validation:
-        email_validation_mode: html5
+  validation:
+    email_validation_mode: html5
 
-        # Enables validator auto-mapping support.
-        # For instance, basic validation constraints will be inferred from Doctrine's metadata.
-        #auto_mapping:
-        #    App\Entity\: []
+    # Enables validator auto-mapping support.
+    # For instance, basic validation constraints will be inferred from Doctrine's metadata.
+    #auto_mapping:
+    #    App\Entity\: []
+    auto_mapping:
+      App\Entity\: [ ]
+      App\Form\Model\: [ ]
 
 when@test:
-    framework:
-        validation:
-            not_compromised_password: false
+  framework:
+    validation:
+      not_compromised_password: false
