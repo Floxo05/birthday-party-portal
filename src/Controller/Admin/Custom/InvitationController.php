@@ -39,8 +39,28 @@ class InvitationController extends AbstractController
         $form = $this->createForm(InvitationFormType::class, null, ['party' => $party]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid())
+        if ($form->isSubmitted())
         {
+            if (!$form->isValid())
+            {
+                $errors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $formField = $error->getOrigin(); // Das Feld, an dem der Fehler auftrat
+                    $fieldName = $formField->getPropertyPath(); // Pfadname wie "product[price]"
+                    $message = $error->getMessage();
+                    $errors[] = sprintf('%s: %s', $fieldName, $message);
+                }
+
+                $errorAsString = implode("\n", $errors);
+                return $this->json(
+                    [
+                        'success' => false,
+                        'error' => $errorAsString
+                    ],
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
             /** @var InvitationFormModel $data */
             $data = $form->getData();
             $invitation = $this->invitationHandler->createInvitation(

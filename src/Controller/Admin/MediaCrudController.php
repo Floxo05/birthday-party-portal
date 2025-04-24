@@ -65,7 +65,7 @@ class MediaCrudController extends AbstractCrudController
             ->hideOnForm();
         yield IntegerField::new('size', 'Größe in MiB')
             ->hideOnForm()
-            ->formatValue(fn(int $size) => round($size / (1024 * 1024), 2));;
+            ->formatValue(fn(int $size) => round($size / (1024 * 1024), 2));
         yield DateField::new('uploadedAt', 'Hochgeladen am')
             ->hideOnForm();
 
