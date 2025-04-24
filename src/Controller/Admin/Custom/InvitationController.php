@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Controller\Admin\Custom;
 
 use App\Controller\Admin\InvitationCrudController;
-use App\DTO\Admin\InvitationDataDTO;
 use App\Entity\Party;
 use App\Form\Admin\InvitationFormType;
+use App\Form\Model\InvitationFormModel;
 use App\Service\Invitation\InvitationHandler\InvitationHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -41,7 +41,7 @@ class InvitationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid())
         {
-            /** @var InvitationDataDTO $data */
+            /** @var InvitationFormModel $data */
             $data = $form->getData();
             $invitation = $this->invitationHandler->createInvitation(
                 $party,
