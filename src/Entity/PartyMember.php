@@ -16,8 +16,8 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\DiscriminatorMap(['host' => PartyMember::ROLE_HOST, 'guest' => PartyMember::ROLE_GUEST])]
 abstract class PartyMember
 {
-    const ROLE_HOST = 'Host';
-    const ROLE_GUEST = 'Guest';
+    const string ROLE_HOST = 'Host';
+    const string ROLE_GUEST = 'Guest';
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
