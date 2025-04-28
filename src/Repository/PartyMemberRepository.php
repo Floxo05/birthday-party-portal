@@ -9,6 +9,8 @@ use App\Entity\PartyMember;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<PartyMember>
@@ -26,8 +28,8 @@ class PartyMemberRepository extends ServiceEntityRepository
             ->select('COUNT(pm.id)')
             ->where('pm.user = :user')
             ->andWhere('pm.party = :party')
-            ->setParameter('user', $user)
-            ->setParameter('party', $party)
+            ->setParameter('user', $user->getId(), UuidType::NAME)
+            ->setParameter('party', $party->getId(), UuidType::NAME)
             ->getQuery()
             ->getSingleScalarResult();
     }

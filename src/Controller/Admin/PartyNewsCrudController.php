@@ -8,10 +8,12 @@ use App\Form\FormHandling\NestedInputBag\NestedInputBagFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -32,6 +34,13 @@ class PartyNewsCrudController extends AbstractHostCrudController
     {
         return PartyNews::class;
     }
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return parent::configureActions($actions)
+            ->remove(Crud::PAGE_INDEX, Action::NEW);
+    }
+
 
     public function createEntity(string $entityFqcn): PartyNews
     {
@@ -78,16 +87,9 @@ class PartyNewsCrudController extends AbstractHostCrudController
         yield AssociationField::new('party')
             ->setDisabled(true);
 
-        ##########> text >##########
-        yield TextEditorField::new('text')
-            ->setRequired(true)
-            ->onlyOnForms();
+        yield TextareaField::new('text')
+            ->setRequired(true);
 
-        yield TextField::new('text')
-            ->renderAsHtml()
-            ->setRequired(true)
-            ->onlyOnIndex();
-        ##########< text <##########
 
         yield AssociationField::new('media')
             ->setRequired(false)
@@ -95,7 +97,9 @@ class PartyNewsCrudController extends AbstractHostCrudController
             {
                 return $queryBuilder
                     ->where('entity.party = :party')
+                    ->andWhere('entity.mimeType in (:mimeType)')
                     ->setParameter('party', $partyId, 'uuid')
+                    ->setParameter('mimeType', ['image/jpeg', 'image/png'])
                     ->orderBy('entity.id', 'DESC');
             });
 

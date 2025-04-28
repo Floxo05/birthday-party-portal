@@ -4,7 +4,12 @@
 <div class="col-12">
     <div class="card shadow-sm {% if isPast %}text-muted opacity-75{% endif %}">
         <div class="card-body">
-            <h5 class="card-title">{{ party.title }}</h5>
+            <h5 class="card-title">
+                <a href="{{ path('party_show', {id: party.id}) }}"
+                   class="stretched-link text-decoration-none text-dark">
+                    {{ party.title }}
+                </a>
+            </h5>
             <p class="card-text">
                 📅 {{ party.partyDate|date('d.m.Y') }}
                 <br>
@@ -14,7 +19,8 @@
                     🎉 {{ membership.role|translateRole }}
                 {% endif %}
             </p>
-            <a href="#" class="btn btn-outline-primary btn-sm">Details ansehen</a>
+            <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-outline-primary btn-sm">Details
+                ansehen</a>
         </div>
     </div>
 </div>
