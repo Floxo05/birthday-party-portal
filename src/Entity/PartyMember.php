@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Enum\ResponseStatus;
 use App\Repository\PartyMemberRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
@@ -31,6 +32,9 @@ abstract class PartyMember
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'partyMembers')]
     private ?User $user = null;
+
+    #[ORM\Column(enumType: ResponseStatus::class, options: ['default' => ResponseStatus::PENDING])]
+    private ?ResponseStatus $responseStatus = null;
 
     public function getId(): ?Uuid
     {
@@ -62,4 +66,16 @@ abstract class PartyMember
     }
 
     abstract public function getRole(): string;
+
+    public function getResponseStatus(): ?ResponseStatus
+    {
+        return $this->responseStatus;
+    }
+
+    public function setResponseStatus(ResponseStatus $responseStatus): static
+    {
+        $this->responseStatus = $responseStatus;
+
+        return $this;
+    }
 }
