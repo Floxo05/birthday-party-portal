@@ -5,9 +5,9 @@ namespace App\Controller\Admin;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Service\Media\MediaStorage\MediaStorage;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -15,11 +15,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class MediaCrudController extends AbstractCrudController
+class MediaCrudController extends AbstractHostCrudController
 {
 
 
@@ -42,6 +43,13 @@ class MediaCrudController extends AbstractCrudController
         {
             throw new \RuntimeException('Context must be set');
         }
+
+        $user = $this->getUser();
+        if (!$user instanceof User)
+        {
+            $this->createAccessDeniedException();
+        }
+        $userId = $user->getId();
 
         yield TextField::new('originalFilename')
             ->setLabel('Datei')
@@ -70,7 +78,19 @@ class MediaCrudController extends AbstractCrudController
             ->hideOnForm();
 
         yield AssociationField::new('party')
-            ->setRequired(true);
+            ->setRequired(true)
+            ->setQueryBuilder(function (QueryBuilder $queryBuilder) use ($userId)
+            {
+                $queryBuilder
+                    ->innerJoin('entity.partyMembers', 'partyMembers')
+                    ->innerJoin('partyMembers.user', 'user')
+                    ->andWhere('user = :user')
+                    ->setParameter('user', $userId, UuidType::NAME)
+                    ->andWhere('partyMembers INSTANCE OF App\Entity\Host');
+            }
+            );
+
+
         yield AssociationField::new('uploader', 'Hochgeladen von')->hideOnForm();
 
         yield ImageField::new('storagePath')

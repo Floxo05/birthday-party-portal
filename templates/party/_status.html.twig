@@ -1,0 +1,11 @@
+{% set membership = party.partyMembers|filter(m => m.user == currentUser)|first %}
+
+{% if membership %}
+    <span class="badge {% if membership.responseStatus.value == 'accepted' %}bg-success{% elseif membership.responseStatus.value == 'declined' %}bg-danger{% else %}bg-secondary{% endif %}">
+        {{ membership.responseStatus|response_status_label }}
+    </span>
+{% else %}
+    <div class="alert alert-warning mt-3">
+        Du bist kein Mitglied dieser Party.
+    </div>
+{% endif %}

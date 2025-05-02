@@ -23,9 +23,12 @@ class PartyFactory
 
     public function create(array $override = []): Party
     {
+        $date = $override['date'] ?? $this->faker->dateTimeBetween('+1 day', '+1 year');
         $party = new Party();
         $party->setTitle($override['title'] ?? $this->faker->company());
-        $party->setPartyDate($override['date'] ?? $this->faker->dateTimeBetween('+1 day', '+1 year'));
+        $party->setPartyDate($date);
+        $party->setRsvpDeadline($date);
+
 
         $this->em->persist($party);
         $this->em->flush();

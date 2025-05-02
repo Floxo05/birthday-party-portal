@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nachricht zu {{ party.title }}{% endblock %}
+
+{% block body %}
+    <h1 class="mb-4">Nachricht für {{ party.title }}</h1>
+
+    <div class="card shadow-sm">
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ news.text }}</h5>
+
+            {% if news.media %}
+                <img src="{{ path('app_media_view', {id: news.media.id}) }}"
+                     class="img-fluid mt-3"
+                     style="max-width: 500px; height: auto;"
+                     alt="News Bild">
+            {% endif %}
+
+            <small class="text-muted mt-3">{{ news.createdAt|date('d.m.Y H:i') }}</small>
+        </div>
+    </div>
+
+    <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-secondary mt-4">
+        Zurück zur Party-Übersicht
+    </a>
+{% endblock %}

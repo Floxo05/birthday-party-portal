@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\MediaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
-class Media
+class Media implements \Stringable
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -37,6 +39,17 @@ class Media
 
     #[ORM\Column]
     private ?\DateTimeImmutable $uploadedAt = null;
+
+    /**
+     * @var Collection<int, PartyNews>
+     */
+    #[ORM\OneToMany(targetEntity: PartyNews::class, mappedBy: 'media')]
+    private Collection $partyNews;
+
+    public function __construct()
+    {
+        $this->partyNews = new ArrayCollection();
+    }
 
     public function getId(): ?Uuid
     {
@@ -125,5 +138,43 @@ class Media
         $this->uploadedAt = $uploadedAt;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, PartyNews>
+     */
+    public function getPartyNews(): Collection
+    {
+        return $this->partyNews;
+    }
+
+    public function addPartyNews(PartyNews $partyNews): static
+    {
+        if (!$this->partyNews->contains($partyNews))
+        {
+            $this->partyNews->add($partyNews);
+            $partyNews->setMedia($this);
+        }
+
+        return $this;
+    }
+
+    public function removePartyNews(PartyNews $partyNews): static
+    {
+        if ($this->partyNews->removeElement($partyNews))
+        {
+            // set the owning side to null (unless already changed)
+            if ($partyNews->getMedia() === $this)
+            {
+                $partyNews->setMedia(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getOriginalFilename() ?? '';
     }
 }

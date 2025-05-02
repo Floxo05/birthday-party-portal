@@ -56,11 +56,23 @@ class Party implements \Stringable
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'party')]
     private Collection $media;
 
+    /**
+     * @var Collection<int, PartyNews>
+     */
+    #[ORM\OneToMany(targetEntity: PartyNews::class, mappedBy: 'party', orphanRemoval: true)]
+    private Collection $partyNews;
+
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    #[Assert\Expression('this.getRsvpDeadline() < this.getPartyDate()')]
+    #[Assert\NotBlank]
+    private ?\DateTimeImmutable $rsvpDeadline = null;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
         $this->invitations = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->partyNews = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -191,6 +203,51 @@ class Party implements \Stringable
                 $medium->setParty(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PartyNews>
+     */
+    public function getPartyNews(): Collection
+    {
+        return $this->partyNews;
+    }
+
+    public function addPartyNews(PartyNews $partyNews): static
+    {
+        if (!$this->partyNews->contains($partyNews))
+        {
+            $this->partyNews->add($partyNews);
+            $partyNews->setParty($this);
+        }
+
+        return $this;
+    }
+
+    public function removePartyNews(PartyNews $partyNews): static
+    {
+        if ($this->partyNews->removeElement($partyNews))
+        {
+            // set the owning side to null (unless already changed)
+            if ($partyNews->getParty() === $this)
+            {
+                $partyNews->setParty(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRsvpDeadline(): ?\DateTimeImmutable
+    {
+        return $this->rsvpDeadline;
+    }
+
+    public function setRsvpDeadline(?\DateTimeImmutable $rsvpDeadline): static
+    {
+        $this->rsvpDeadline = $rsvpDeadline;
 
         return $this;
     }

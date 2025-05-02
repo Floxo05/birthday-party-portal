@@ -10,7 +10,6 @@ use App\Entity\User;
 use App\Exception\Invitation\InvitationExpiredException;
 use App\Exception\Invitation\InvitationLimitReachedException;
 use App\Exception\Invitation\InvitationNotFoundException;
-use App\Exception\Party\UserAlreadyInPartyException;
 use App\Service\Invitation\InvitationLinkGenerator\InvitationLinkGeneratorInterface;
 use App\Service\Invitation\InvitationManager\InvitationManagerInterface;
 use App\Service\PartyMember\PartyMembershipManager\PartyMembershipManagerInterface;
@@ -60,14 +59,8 @@ readonly class InvitationHandler implements InvitationHandlerInterface
 
         if ($user)
         {
-            try
-            {
-                $this->partyMembershipService->addUserToParty($user, $invitation);
-                return new InvitationProcessingResult(true, $invitation);
-            } catch (UserAlreadyInPartyException $e)
-            {
-                throw $e;
-            }
+            $this->partyMembershipService->addUserToParty($user, $invitation);
+            return new InvitationProcessingResult(true, $invitation);
         }
 
         return new InvitationProcessingResult(false, $invitation);
