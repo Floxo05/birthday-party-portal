@@ -14,8 +14,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -44,9 +42,10 @@ class PartyNewsCrudController extends AbstractHostCrudController
 
     public function createEntity(string $entityFqcn): PartyNews
     {
-        $partyId = $this->getContext()->getRequest()->query->get('party_id');
+        /** @var string|null $partyId */
+        $partyId = $this->getContext()?->getRequest()->query->get('party_id');
 
-        if (!$partyId)
+        if ($partyId === null)
         {
             throw new \RuntimeException('Keine Party-ID gesetzt.');
         }
@@ -56,12 +55,12 @@ class PartyNewsCrudController extends AbstractHostCrudController
             throw new \RuntimeException('Ungültige party_id.');
         }
 
-        /** @var Party $party */
+        /** @var Party|null $party */
         $party = $this->entityManager
             ->getRepository(Party::class)
             ->find($partyId);
 
-        if (!$party)
+        if ($party === null)
         {
             throw $this->createNotFoundException('Party nicht gefunden.');
         }

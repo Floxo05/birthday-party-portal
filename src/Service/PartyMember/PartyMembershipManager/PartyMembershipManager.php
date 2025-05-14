@@ -6,6 +6,7 @@ namespace App\Service\PartyMember\PartyMembershipManager;
 
 use App\Entity\Invitation;
 use App\Entity\User;
+use App\Enum\ResponseStatus;
 use App\Exception\Party\UserAlreadyInPartyException;
 use App\Repository\PartyMemberRepository;
 use App\Service\PartyMember\PartyMemberFactory\PartyMemberFactory;
@@ -45,6 +46,7 @@ readonly class PartyMembershipManager implements PartyMembershipManagerInterface
 
         $partyMember->setUser($user);
         $partyMember->setParty($party);
+        $partyMember->setResponseStatus(ResponseStatus::PENDING);
 
         $invitation->incrementUses();
 

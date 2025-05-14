@@ -27,7 +27,7 @@ class PartyFactory
         $party = new Party();
         $party->setTitle($override['title'] ?? $this->faker->company());
         $party->setPartyDate($date);
-        $party->setRsvpDeadline($date);
+        $party->setRsvpDeadline(\DateTimeImmutable::createFromMutable($date));
 
 
         $this->em->persist($party);

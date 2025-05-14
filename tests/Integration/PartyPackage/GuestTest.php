@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\PartyPackage;
 
 use App\Entity\Guest;
+use App\Enum\ResponseStatus;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Integration\Trait\PartyTrait;
 use App\Tests\Integration\Trait\UserTrait;
@@ -27,6 +28,7 @@ class GuestTest extends DatabaseTestCase
         $guest
             ->setParty($party)
             ->setUser($user)
+            ->setResponseStatus(ResponseStatus::PENDING)
         ;
 
         $this->entityManager->persist($guest);
