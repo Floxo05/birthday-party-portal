@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Repository;
 
 use App\Entity\UserMessageStatus;
-use App\Entity\User;
-use App\Entity\PartyNews;
 use App\Factory\PartyNewsFactory;
 use App\Factory\UserFactory;
 use App\Repository\UserMessageStatusRepository;
@@ -42,7 +40,7 @@ class UserMessageStatusRepositoryTest extends KernelTestCase
         $this->em->flush();
 
         // Act: Suche mit Repository
-        /** @var UserMessageStatus $result */
+        /** @var UserMessageStatus|null $result */
         $result = $this->repository->findOneByUserAndPartyNews($user, $partyNews);
 
         // Assert: Treffer prüfen
@@ -53,19 +51,19 @@ class UserMessageStatusRepositoryTest extends KernelTestCase
 
     public function testFindOneByUserAndPartyNewsReturnsNullIfNotExists(): void
     {
-        $user = new User();
-        $user->setEmail('neu@example.com');
-        $user->setPassword('pw');
-        $this->em->persist($user);
+        // Arrange: Erstelle User, News und Status
+        /** @var UserFactory $userFactory */
+        $userFactory = $this->getContainer()->get(UserFactory::class);
+        $user = $userFactory->create();
 
-        $news = new PartyNews();
-        $news->setTitle('leer');
-        $news->setContent('...');
-        $this->em->persist($news);
+        $partyNewsFactory = $this->getContainer()->get(PartyNewsFactory::class);
+        $partyNews = $partyNewsFactory->create();
 
-        $this->em->flush();
+        // Act: Suche mit Repository
+        /** @var UserMessageStatus|null $result */
+        $result = $this->repository->findOneByUserAndPartyNews($user, $partyNews);
 
-        $result = $this->repository->finOneByUserAndPartyNews($user, $news);
+        // Assert: no hit
         $this->assertNull($result);
     }
 }

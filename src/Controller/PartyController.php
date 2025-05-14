@@ -7,15 +7,21 @@ namespace App\Controller;
 use App\Entity\Party;
 use App\Entity\PartyNews;
 use App\Entity\User;
+use App\Event\BeforeLoadDataForPartyEvent;
 use App\Repository\PartyMemberRepository;
 use App\Repository\PartyNewsRepository;
 use http\Exception\UnexpectedValueException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class PartyController extends AbstractController
 {
+    public function __construct(private readonly EventDispatcherInterface $eventDispatcher)
+    {
+    }
+
     #[Route('/party/{id}', name: 'party_show')]
     public function show(
         Party $party,
@@ -33,6 +39,8 @@ final class PartyController extends AbstractController
         {
             throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
         }
+
+        $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
 
         $news = $partyNewsRepository->findBy(
             ['party' => $party],
@@ -65,6 +73,8 @@ final class PartyController extends AbstractController
             throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
         }
 
+        $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
+
         $news = $partyNewsRepository->findBy(
             ['party' => $party],
             ['createdAt' => 'DESC']
@@ -96,6 +106,8 @@ final class PartyController extends AbstractController
         {
             throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Nachricht.');
         }
+
+        $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
 
         return $this->render('party/news_detail.html.twig', [
             'news' => $news,

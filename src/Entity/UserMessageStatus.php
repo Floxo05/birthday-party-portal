@@ -23,8 +23,7 @@ class UserMessageStatus
     #[ORM\ManyToOne(inversedBy: 'userMessageStatuses')]
     private ?PartyNews $partyNews = null;
 
-    #[ORM\Column]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $readAt = null;
 
     public function getId(): ?Uuid

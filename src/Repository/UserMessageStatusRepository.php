@@ -20,7 +20,12 @@ class UserMessageStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, UserMessageStatus::class);
     }
 
-    public function findOneByUserAndPartyNews(User $user, PartyNews $news)
+    /**
+     * @param User $user
+     * @param PartyNews $news
+     * @return UserMessageStatus|null
+     */
+    public function findOneByUserAndPartyNews(User $user, PartyNews $news): object|null
     {
         return $this->findOneBy([
             'user' => $user,
