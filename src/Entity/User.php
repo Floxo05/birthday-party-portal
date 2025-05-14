@@ -58,10 +58,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
     private Collection $media;
 
+    /**
+     * @var Collection<int, UserMessageStatus>
+     */
+    #[ORM\OneToMany(targetEntity: UserMessageStatus::class, mappedBy: 'user')]
+    private Collection $userMessageStatuses;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->userMessageStatuses = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
@@ -221,6 +228,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
             if ($medium->getUploader() === $this)
             {
                 $medium->setUploader(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserMessageStatus>
+     */
+    public function getUserMessageStatuses(): Collection
+    {
+        return $this->userMessageStatuses;
+    }
+
+    public function addUserMessageStatus(UserMessageStatus $userMessageStatus): static
+    {
+        if (!$this->userMessageStatuses->contains($userMessageStatus)) {
+            $this->userMessageStatuses->add($userMessageStatus);
+            $userMessageStatus->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserMessageStatus(UserMessageStatus $userMessageStatus): static
+    {
+        if ($this->userMessageStatuses->removeElement($userMessageStatus)) {
+            // set the owning side to null (unless already changed)
+            if ($userMessageStatus->getUser() === $this) {
+                $userMessageStatus->setUser(null);
             }
         }
 
