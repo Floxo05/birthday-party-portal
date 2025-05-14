@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\PartyPackage;
 
 use App\Entity\Host;
+use App\Enum\ResponseStatus;
 use App\Tests\Integration\DatabaseTestCase;
 use App\Tests\Integration\Trait\PartyTrait;
 use App\Tests\Integration\Trait\UserTrait;
@@ -14,6 +15,9 @@ class HostTest extends DatabaseTestCase
     use UserTrait;
     use PartyTrait;
 
+    /**
+     * @throws \Exception
+     */
     public function testCreatePartyMember(): void
     {
         $hasher = $this->getContainer()->get(UserPasswordHasherInterface::class);
@@ -24,6 +28,7 @@ class HostTest extends DatabaseTestCase
         $host
             ->setParty($party)
             ->setUser($user)
+            ->setResponseStatus(ResponseStatus::ACCEPTED)
         ;
 
         $this->entityManager->persist($host);

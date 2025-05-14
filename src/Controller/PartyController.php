@@ -9,6 +9,7 @@ use App\Entity\PartyNews;
 use App\Entity\User;
 use App\Repository\PartyMemberRepository;
 use App\Repository\PartyNewsRepository;
+use http\Exception\UnexpectedValueException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -86,6 +87,10 @@ final class PartyController extends AbstractController
         }
 
         $party = $news->getParty();
+        if ($party === null)
+        {
+            throw new UnexpectedValueException('Die Nachricht ist zu keiner Party zugeordnet.');
+        }
 
         if (!$partyMemberRepository->isUserInParty($user, $party))
         {

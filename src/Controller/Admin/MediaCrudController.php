@@ -47,7 +47,7 @@ class MediaCrudController extends AbstractHostCrudController
         $user = $this->getUser();
         if (!$user instanceof User)
         {
-            $this->createAccessDeniedException();
+            throw $this->createAccessDeniedException();
         }
         $userId = $user->getId();
 

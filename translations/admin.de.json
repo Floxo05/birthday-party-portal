@@ -4,7 +4,8 @@
       "field": {
         "title": "Titel",
         "date": "Datum",
-        "invitations": "Einladungen"
+        "invitations": "Einladungen",
+        "rsvpDeadline": "Rückmeldung bis spätestens"
       }
     },
     "roles": {
