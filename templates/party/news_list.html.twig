@@ -10,7 +10,7 @@
             Es gibt noch keine Nachrichten für diese Party.
         </div>
     {% else %}
-        {% include 'party/_news_summary.html.twig' with { 'news': news } %}
+        {% include 'party/_news_summary.html.twig' with { 'news': news, 'statusMap': statusMap } %}
     {% endif %}
 
     <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-secondary mt-4">

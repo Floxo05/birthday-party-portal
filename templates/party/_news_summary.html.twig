@@ -1,9 +1,20 @@
 <div class="list-group mt-3">
     {% for item in news %}
-        <a href="{{ path('party_news_detail', {id: item.id}) }}" class="list-group-item list-group-item-action">
-            <div class="d-flex flex-column">
-                <h5 class="mb-1">{{ item.text|u.truncate(30, '...') }}</h5>
-                <small class="text-muted mt-2">{{ item.createdAt|date('d.m.Y H:i') }}</small>
+        {% set status = statusMap[item.id ~ '']|default(null) %}
+        {% set isUnread = not status or not status.isRead() %}
+
+        <a href="{{ path('party_news_detail', {id: item.id}) }}"
+           class="list-group-item list-group-item-action
+                  {% if isUnread %}list-group-item-warning{% endif %}">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-column">
+                    <h5 class="mb-1">{{ item.text|u.truncate(30, '...') }}</h5>
+                    <small class="text-muted mt-2">{{ item.createdAt|date('d.m.Y H:i') }}</small>
+                </div>
+
+                {% if isUnread %}
+                    <span class="badge bg-warning text-dark">Neu</span>
+                {% endif %}
             </div>
         </a>
     {% else %}
