@@ -55,7 +55,7 @@ class UserMessageStatus
         return $this;
     }
 
-    public function isRead(): ?bool
+    public function isRead(): bool
     {
         return $this->readAt !== null;
     }

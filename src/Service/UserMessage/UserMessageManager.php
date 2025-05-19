@@ -22,11 +22,15 @@ readonly class UserMessageManager
 
     public function markAsRead(User $user, PartyNews $news): void
     {
+        /** @var UserMessageStatus|null $userMessageStatus */
+        $userMessageStatus = $this->messageStatusRepository->findOneByUserAndPartyNews($user, $news);
+        if (null === $userMessageStatus)
+        {
+            throw new \LogicException('user message should already exist at this point');
+        }
 
-    }
-
-    public function getUserMessage()
-    {
+        $userMessageStatus->setReadAt(new \DateTimeImmutable('now'));
+        $this->entityManager->flush();
     }
 
     public function ensureAllMessagesHaveStatus(User $user, Party $party): void

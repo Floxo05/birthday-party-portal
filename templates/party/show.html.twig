@@ -19,7 +19,7 @@
     <section class="mb-2 pb-2 border-bottom">
         <h2 class="h4 mb-3 text-primary">Nachrichten</h2>
 
-        {% include 'party/_news_summary.html.twig' with { 'news': news } %}
+        {% include 'party/_news_summary.html.twig' with { 'news': news, 'statusMap': statusMap } %}
 
         {% if news|length > 0 %}
             <a href="{{ path('party_news_list', {id: party.id}) }}" class="btn btn-link mt-3">
@@ -33,4 +33,35 @@
 
         {% include 'party/_actions.html.twig' %}
     </section>
+
+    {% if popupNews is not empty %}
+        <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content shadow-lg">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Wichtige Nachrichten</h5>
+                        <a href="{{ app.request.uri }}" class="btn-close"></a> {# Fake close by reload #}
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group mt-3">
+                            {% for popup in popupNews %}
+                                <a href="{{ path('party_news_detail', {id: popup.id}) }}"
+                                   class="list-group-item list-group-item-action list-group-item-warning">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex flex-column">
+                                            <h5 class="mb-1">{{ popup.text }}</h5>
+                                            <small class="text-muted mt-2">{{ popup.createdAt|date('d.m.Y H:i') }}</small>
+                                        </div>
+                                    </div>
+                                </a>
+                                {% if not loop.last %}
+                                    <hr>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
