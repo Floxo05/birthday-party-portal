@@ -4,7 +4,6 @@ services:
     container_name: symfony_app
     depends_on:
       - db
-      - db_test
       - minio
     environment:
       APP_ENV: dev
@@ -38,16 +37,6 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-
-  db_test:
-    image: postgres:16
-    container_name: symfony_test_db
-    environment:
-      POSTGRES_DB: symfony_test
-      POSTGRES_USER: symfony
-      POSTGRES_PASSWORD: symfony
-    volumes:
-      - db_test_data:/var/lib/postgresql/data
 
   minio:
     image: minio/minio:latest
