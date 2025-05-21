@@ -22,7 +22,7 @@ class Media implements \Stringable
     #[ORM\ManyToOne(inversedBy: 'media')]
     private ?Party $party = null;
 
-    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'media')]
     private ?User $uploader = null;
 
     #[ORM\Column(length: 255)]

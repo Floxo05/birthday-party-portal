@@ -1,0 +1,7 @@
+sf() {
+  docker-compose exec app bin/console "$@"
+}
+
+ea() {
+  docker-compose exec app "$@"
+}

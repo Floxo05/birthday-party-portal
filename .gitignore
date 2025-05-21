@@ -37,5 +37,7 @@ yarn-error.log
 # EasyAdmin
 /public/bundles/
 
+public/assets
+
 # qa
 qa/reports/*

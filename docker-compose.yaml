@@ -1,0 +1,70 @@
+services:
+  app:
+    image: webdevops/php-apache:8.3
+    container_name: symfony_app
+    depends_on:
+      - db
+      - db_test
+      - minio
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+      DOCUMENT_ROOT: /app/public
+      WEB_DOCUMENT_ROOT: /app/public
+
+      DATABASE_URL: "pgsql://symfony:symfony@db:5432/symfony"
+      DATABASE_TEST_URL: "pgsql://symfony:symfony@db_test:5432/symfony_test"
+
+      MEDIA_BUCKET: birthday-portal-media
+      AWS_ACCESS_KEY_ID: root
+      AWS_SECRET_ACCESS_KEY: password
+      AWS_REGION: eu-central-1
+      AWS_ENDPOINT: http://minio:9000
+    working_dir: /app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/app
+    restart: unless-stopped
+
+  db:
+    image: postgres:16
+    container_name: symfony_db
+    environment:
+      POSTGRES_DB: symfony
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  db_test:
+    image: postgres:16
+    container_name: symfony_test_db
+    environment:
+      POSTGRES_DB: symfony_test
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: symfony_minio
+    entrypoint: /bin/sh
+    command: -c "mkdir -p /data/birthday-portal-media && exec minio server --console-address ':9001' /data"
+    environment:
+      MINIO_ROOT_USER: root
+      MINIO_ROOT_PASSWORD: password
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  db_test_data:
+  minio_data:
