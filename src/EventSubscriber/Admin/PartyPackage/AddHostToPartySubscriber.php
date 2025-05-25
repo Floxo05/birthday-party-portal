@@ -6,16 +6,17 @@ namespace App\EventSubscriber\Admin\PartyPackage;
 use App\Entity\Host;
 use App\Entity\Party;
 use App\Entity\User;
+use App\Enum\ResponseStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\AfterEntityPersistedEvent;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AddHostToPartySubscriber implements EventSubscriberInterface
+readonly class AddHostToPartySubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly Security $security,
-        private readonly EntityManagerInterface $em,
+        private Security               $security,
+        private EntityManagerInterface $em,
     )
     {
     }
@@ -47,7 +48,8 @@ class AddHostToPartySubscriber implements EventSubscriberInterface
         $newHost = new Host();
         $newHost
             ->setParty($partyEntity)
-            ->setUser($user);
+            ->setUser($user)
+            ->setResponseStatus(ResponseStatus::ACCEPTED);
 
         $this->em->persist($newHost);
         $this->em->flush();
