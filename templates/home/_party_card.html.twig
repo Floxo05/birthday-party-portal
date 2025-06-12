@@ -12,12 +12,6 @@
             </h5>
             <p class="card-text">
                 📅 {{ party.partyDate|date('d.m.Y') }}
-                <br>
-                {% if membership.role == 'Host' %}
-                    🏠 {{ membership.role|translateRole }}
-                {% else %}
-                    🎉 {{ membership.role|translateRole }}
-                {% endif %}
             </p>
             <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-outline-primary btn-sm">Details
                 ansehen</a>
