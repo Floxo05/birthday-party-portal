@@ -37,6 +37,12 @@ class RegisterFormType extends AbstractType
                     )
                 ]
             ])
+            ->add('phoneNumber', TextType::class, [
+                'label' => 'Telefonnummer',
+                'attr' => ['class' => 'form-control', 'placeholder' => '0123456789'],
+                'help' => 'Optional, um Benachrichtigungen über Neuigkeiten auf WhatsApp zu erhalten.',
+                'required' => false
+            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Registrieren',
                 'attr' => ['class' => 'btn btn-primary w-100 mt-3']

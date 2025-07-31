@@ -32,6 +32,8 @@ class UserCrudController extends AbstractCrudController
             ->setDisabled();
         yield TextField::new('name')
             ->setDisabled();
+        yield TextField::new('phoneNumber')
+            ->setDisabled();
         yield ChoiceField::new('roles')
             ->setFormTypeOptions([
                 'multiple' => true,
