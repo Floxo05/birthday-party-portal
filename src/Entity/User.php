@@ -64,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \String
     /**
      * @var Collection<int, UserMessageStatus>
      */
-    #[ORM\OneToMany(targetEntity: UserMessageStatus::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: UserMessageStatus::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $userMessageStatuses;
 
     public function __construct()

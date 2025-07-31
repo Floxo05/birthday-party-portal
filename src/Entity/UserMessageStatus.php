@@ -21,6 +21,7 @@ class UserMessageStatus
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'userMessageStatuses')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?PartyNews $partyNews = null;
 
     #[ORM\Column(nullable: true)]
