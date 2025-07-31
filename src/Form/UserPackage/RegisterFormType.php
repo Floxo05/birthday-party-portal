@@ -8,7 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 class RegisterFormType extends AbstractType
 {
@@ -25,7 +27,15 @@ class RegisterFormType extends AbstractType
             ])
             ->add('password', PasswordType::class, [
                 'label' => 'Passwort',
-                'attr' => ['class' => 'form-control', 'placeholder' => 'Passwort']
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Passwort'],
+                'constraints' => [
+                    new NotBlank(),
+                    new Length(['min' => 8]),
+                    new PasswordStrength(
+                        minScore: PasswordStrength::STRENGTH_WEAK,
+                        message: 'Passwort ist nicht stark genug.'
+                    )
+                ]
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Registrieren',
