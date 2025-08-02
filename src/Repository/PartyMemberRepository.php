@@ -9,6 +9,8 @@ use App\Entity\PartyMember;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @extends ServiceEntityRepository<PartyMember>
@@ -26,9 +28,30 @@ class PartyMemberRepository extends ServiceEntityRepository
             ->select('COUNT(pm.id)')
             ->where('pm.user = :user')
             ->andWhere('pm.party = :party')
-            ->setParameter('user', $user)
-            ->setParameter('party', $party)
+            ->setParameter('user', $user->getId(), UuidType::NAME)
+            ->setParameter('party', $party->getId(), UuidType::NAME)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Find all party memberships for a user, ordered by party date ascending.
+     *
+     * @param User $user
+     * @return PartyMember[]
+     */
+    public function findByUserOrderedByPartyDate(User $user): array
+    {
+        /** @var PartyMember[] $result */
+        $result = $this->createQueryBuilder('pm')
+            ->leftJoin('pm.party', 'p')
+            ->addSelect('p')
+            ->where('IDENTITY(pm.user) = :userId')
+            ->setParameter('userId', (string)$user->getId(), 'uuid')
+            ->orderBy('p.partyDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return $result;
     }
 }

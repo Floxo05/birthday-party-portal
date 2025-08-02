@@ -14,7 +14,6 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class InvitationFormType extends AbstractType
@@ -63,7 +62,10 @@ class InvitationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'party' => null,
-            'data_class' => InvitationFormModel::class
+            'data_class' => InvitationFormModel::class,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id' => 'invitation_form',
         ]);
     }
 }

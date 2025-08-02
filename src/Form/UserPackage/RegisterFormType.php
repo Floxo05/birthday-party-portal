@@ -4,11 +4,15 @@ declare(strict_types=1);
 namespace App\Form\UserPackage;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 class RegisterFormType extends AbstractType
 {
@@ -25,11 +29,37 @@ class RegisterFormType extends AbstractType
             ])
             ->add('password', PasswordType::class, [
                 'label' => 'Passwort',
-                'attr' => ['class' => 'form-control', 'placeholder' => 'Passwort']
+                'attr' => ['class' => 'form-control', 'placeholder' => 'Passwort'],
+                'constraints' => [
+                    new NotBlank(),
+                    new Length(['min' => 8]),
+                    new PasswordStrength(
+                        minScore: PasswordStrength::STRENGTH_WEAK,
+                        message: 'Passwort ist nicht stark genug.'
+                    )
+                ]
+            ])
+            ->add('phoneNumber', TextType::class, [
+                'label' => 'Telefonnummer',
+                'attr' => ['class' => 'form-control', 'placeholder' => '0123456789'],
+                'help' => 'Optional, um Benachrichtigungen über Neuigkeiten auf WhatsApp zu erhalten.',
+                'required' => false
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Registrieren',
                 'attr' => ['class' => 'btn btn-primary w-100 mt-3']
+            ])
+            ->add('_csrf_token', HiddenType::class, [
+                'mapped' => false,
             ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'csrf_protection' => true,
+            'csrf_field_name' => '_csrf_token',
+            'csrf_token_id' => 'authenticate',
+        ]);
     }
 }

@@ -9,6 +9,7 @@ use App\Entity\Host;
 use App\Entity\Party;
 use App\Entity\PartyMember;
 use App\Entity\User;
+use App\Enum\ResponseStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
@@ -33,6 +34,7 @@ readonly class PartyMemberFactory
     {
         $pm->setUser($user);
         $pm->setParty($party);
+        $pm->setResponseStatus(ResponseStatus::PENDING);
 
         $this->em->persist($pm);
         $this->em->flush();

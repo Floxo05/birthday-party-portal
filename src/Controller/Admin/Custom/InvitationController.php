@@ -13,10 +13,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use UnexpectedValueException;
 
 class InvitationController extends AbstractController
 {
@@ -44,9 +47,12 @@ class InvitationController extends AbstractController
             if (!$form->isValid())
             {
                 $errors = [];
-                foreach ($form->getErrors(true) as $error) {
+                foreach ($form->getErrors(true) as /** @var FormErrorIterator $error */ $errorIterator)
+                {
+                    /** @var FormError $error */
+                    $error = $errorIterator;
                     $formField = $error->getOrigin(); // Das Feld, an dem der Fehler auftrat
-                    $fieldName = $formField->getPropertyPath(); // Pfadname wie "product[price]"
+                    $fieldName = $formField?->getPropertyPath(); // Pfadname wie "product[price]"
                     $message = $error->getMessage();
                     $errors[] = sprintf('%s: %s', $fieldName, $message);
                 }
@@ -63,6 +69,22 @@ class InvitationController extends AbstractController
 
             /** @var InvitationFormModel $data */
             $data = $form->getData();
+
+            if ($data->role === null)
+            {
+                throw new UnexpectedValueException('Role must not be null.');
+            }
+
+            if ($data->expiresAt === null)
+            {
+                throw new UnexpectedValueException('ExpiresAt must not be null.');
+            }
+
+            if ($data->maxUses === null)
+            {
+                throw new UnexpectedValueException('MaxUses must not be null.');
+            }
+
             $invitation = $this->invitationHandler->createInvitation(
                 $party,
                 $data->role,

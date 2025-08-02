@@ -25,7 +25,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PartyCrudController extends AbstractCrudController
 {
@@ -49,6 +48,7 @@ class PartyCrudController extends AbstractCrudController
     {
         yield TextField::new('title', 'party.crud.field.title');
         yield DateField::new('partyDate', 'party.crud.field.date');
+        yield DateField::new('rsvpDeadline', 'party.crud.field.rsvpDeadline');
         yield CollectionField::new('invitations', 'party.crud.field.invitations')
             ->onlyOnDetail()
             ->formatValue(function ($value, Party $entity)
@@ -129,12 +129,21 @@ class PartyCrudController extends AbstractCrudController
             ->setHtmlAttributes(['id' => 'open-flyout']) // Statischer Button-ID
             ->setCssClass('btn btn-primary');
 
+        $createPartyNews = Action::new('createPartyNews', 'Nachricht erstellen')
+            ->linkToUrl(fn(Party $party) => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(PartyNewsCrudController::class)
+                ->setAction(Action::NEW)
+                ->set('party_id', $party->getId())
+                ->generateUrl()
+            );
+
         return parent::configureActions($actions)
             ->disable(Action::SAVE_AND_ADD_ANOTHER)
             ->disable(Action::SAVE_AND_CONTINUE)
             ->add(Crud::PAGE_EDIT, Action::DETAIL)
-            ->add(Crud::PAGE_DETAIL, $createInvitation)//            ->update(Crud::PAGE_EDIT,
-            ;
+            ->add(Crud::PAGE_DETAIL, $createInvitation)
+            ->add(Crud::PAGE_DETAIL, $createPartyNews);
     }
 
     #[Override]
@@ -156,7 +165,7 @@ class PartyCrudController extends AbstractCrudController
 
         if ($user === null)
         {
-            throw new AccessDeniedException('Nutzer nicht angemeldet');
+            throw $this->createAccessDeniedException('Nutzer nicht angemeldet');
         }
 
         $queryBuilder
