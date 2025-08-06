@@ -39,6 +39,8 @@ class UserController extends AbstractController
                 $this->addFlash('success', 'Passwort wurde erfolgreich geändert.');
                 return $this->redirectToRoute('user_change_password');
             }
+        } else if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Beim Speichern ist ein Fehler aufgetreten.');
         }
 
         return $this->render('user/change_password.html.twig', [
