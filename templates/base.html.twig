@@ -11,12 +11,12 @@
 <body class="d-flex flex-column min-vh-100">
 
 <!-- Navbar -->
-{% if is_granted('ROLE_USER') %}
-    {% block nav_wrapper %}
+{% block nav_wrapper %}
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             {% block nav %}
                 <div class="container">
                     <a class="navbar-brand" href="{{ path('app_home') }}">Party Portal</a>
+                    {% if is_granted('ROLE_USER') %}
                     {% block navigation %}
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                             <span class="navbar-toggler-icon"></span>
@@ -34,11 +34,11 @@
                             {% endblock %}
                         </div>
                     {% endblock %}
+                    {% endif %}
                 </div>
             {% endblock %}
         </nav>
-    {% endblock %}
-{% endif %}
+{% endblock %}
 
 <!-- Flash-Messages -->
 {% for label, messages in app.flashes %}
