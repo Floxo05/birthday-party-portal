@@ -1,8 +1,37 @@
 {% extends 'base.html.twig' %}
-{% block title %}Rechtliches{% endblock %}
+
+{% block title %}Impressum{% endblock %}
+
 {% block body %}
-    <h1>Rechtliche Hinweise</h1>
-    <p>Dies ist ein nicht-kommerzielles, privates Freizeitprojekt ohne Geschäftsabsicht.</p>
-    <p>Alle Funktionen dienen ausschließlich zur privaten Nutzung im Freundeskreis. Es gibt keine kostenpflichtigen Features. Spenden sind freiwillig und haben keinen Einfluss auf Funktionen.</p>
-    <p>Für Rückfragen: Kontakt über GitHub oder Projektbetreiber.</p>
+    <div class="container mt-5" style="max-width: 700px;">
+        <h1>Impressum</h1>
+
+        <p>Dies ist ein nicht-kommerzielles, rein privates Freizeitprojekt zur Organisation von Geburtstagsfeiern. Es besteht keinerlei geschäftliche Absicht oder Gewinnerzielung.</p>
+
+        <h2 class="mt-4">Verantwortlich für den Inhalt</h2>
+        <p>
+            Florian Wolf<br>
+            E-Mail: <a href="mailto:florian.wolf5@outlook.com">florian.wolf5@outlook.com</a><br>
+            Standort: Deutschland
+        </p>
+
+        <h2 class="mt-4">Haftungsausschluss</h2>
+        <p>
+            Die Nutzung dieser Website erfolgt freiwillig und auf eigene Verantwortung. Es wird keine Haftung für die Inhalte, deren Richtigkeit oder eventuelle Ausfälle übernommen.
+            Dieses Projekt stellt keine kommerzielle Dienstleistung dar.
+        </p>
+
+        <h2 class="mt-4">Urheberrecht</h2>
+        <p>
+            Die Inhalte dieser Seite (Texte, Code, Gestaltung) unterliegen dem Urheberrecht, sofern nicht anders angegeben. Eine Nutzung durch Dritte ist nur nach vorheriger Zustimmung gestattet.
+        </p>
+
+        <h2 class="mt-4">Kontakt</h2>
+        <p>
+            Bei technischen oder inhaltlichen Fragen wenden Sie sich bitte per E-Mail an den Seitenbetreiber.
+        </p>
+
+        <hr class="my-4">
+        <p>Weitere Informationen zum Datenschutz finden Sie in der <a href="{{ path('app_privacy') }}">Datenschutzerklärung</a>.</p>
+    </div>
 {% endblock %}

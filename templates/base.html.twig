@@ -12,29 +12,32 @@
 
 <!-- Navbar -->
 {% block nav_wrapper %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        {% block nav %}
-            <div class="container">
-                <a class="navbar-brand" href="{{ path('app_home') }}">Party Portal</a>
-                {% block navigation %}
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        {% block nav_items %}
-                            <ul class="navbar-nav">
-                                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
-                                <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Abmelden</a></li>
-                                {% if is_granted('ROLE_ORGANIZER') %}
-                                    <li class="nav-item"><a class="nav-link" href="{{ path('admin') }}">Admin-Bereich</a></li>
-                                {% endif %}
-                            </ul>
-                        {% endblock %}
-                    </div>
-                {% endblock %}
-            </div>
-        {% endblock %}
-    </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            {% block nav %}
+                <div class="container">
+                    <a class="navbar-brand" href="{{ path('app_home') }}">Party Portal</a>
+                    {% if is_granted('ROLE_USER') %}
+                    {% block navigation %}
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarNav">
+                            {% block nav_items %}
+                                <ul class="navbar-nav">
+                                    <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}">Home</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ path('app_logout') }}">Abmelden</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ path('user_change_password') }}">Passwort ändern</a></li>
+                                    {% if is_granted('ROLE_ORGANIZER') %}
+                                        <li class="nav-item"><a class="nav-link" href="{{ path('admin') }}">Admin-Bereich</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endblock %}
+                        </div>
+                    {% endblock %}
+                    {% endif %}
+                </div>
+            {% endblock %}
+        </nav>
 {% endblock %}
 
 <!-- Flash-Messages -->
@@ -56,7 +59,7 @@
 <footer class="bg-dark text-light text-center py-3 mt-auto small">
     <div class="container">
         Dies ist ein privates Freizeitprojekt.
-        <a href="{{ path('app_legal') }}" class="link-light text-decoration-underline">Rechtliche Hinweise</a> ·
+        <a href="{{ path('app_impressum') }}" class="link-light text-decoration-underline">Impressum</a> ·
         <a href="{{ path('app_privacy') }}" class="link-light text-decoration-underline">Datenschutz</a>
     </div>
 </footer>
