@@ -20,7 +20,31 @@
 
             {{ form_end(form) }}
 
-            <a href="{{ path('app_register') }}" class="d-block text-center mt-3">Noch kein Account? Registrieren</a>
+            <div class="text-center mt-3">
+                <a href="{{ path('app_register') }}">Noch kein Account? Registrieren</a>
+            </div>
+
+            <div class="text-center mt-2">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Passwort vergessen?</a>
+            </div>
+        </div>
+    </div>
+
+    {# Modal: Hinweis für Passwort vergessen #}
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">Passwort vergessen?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                </div>
+                <div class="modal-body">
+                    Bei Problemen mit dem Login wenden Sie sich bitte direkt an den Seitenbetreiber. Weitere Informationen finden Sie im <a href="{{ path('app_impressum') }}">Impressum</a>.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}

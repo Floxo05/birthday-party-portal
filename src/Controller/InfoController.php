@@ -14,7 +14,7 @@ final class InfoController extends AbstractController
         return $this->render('info/privacy.html.twig');
     }
 
-    #[Route('/rechtliches', name: 'app_legal')]
+    #[Route('/impressum', name: 'app_impressum')]
     public function legal(): Response
     {
         return $this->render('info/legal.html.twig');
