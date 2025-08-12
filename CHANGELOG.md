@@ -12,17 +12,34 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
-## [0.3.0] - 2024-12-19
+## [0.3.0] - 2025-08-12
 
 ### Hinzugefügt
 - Versionsanzeige in der Anwendung
 - Changelog-Dokumentation
 - Verbesserte Projektqualität und Dokumentation
+- Umfassende Projektdokumentation
+  - Neue `docs/` Verzeichnisstruktur mit praktischen Anleitungen
+  - Architektur-Übersicht und technische Details
+  - Setup-Anleitungen für Docker und lokale Entwicklung
+  - Umgebungsvariablen und Konfigurationsdokumentation
+  - Testing & QA-Prozesse mit Skripten
+  - Sicherheitsmodell und Rollenhierarchie
+  - Deployment-Prozesse (Docker, CapRover)
+  - Betrieb und Troubleshooting
+- Architecture Decision Records (ADRs)
+  - Template für zukünftige Entscheidungen
+  - Dokumentation der Symfony/Doctrine-Entscheidung
+  - S3/minIO Storage-Strategie
+  - Rollen- und Zugriffskontrollmodell
+  - Docker/CapRover Deployment-Ansatz
 
 ### Geändert
 - Aktualisierte Projektstruktur und -dokumentation
+- README.md erweitert um Verweise auf die neue Dokumentationsstruktur
+- Dokumentation durchgängig auf Deutsch übersetzt für bessere Konsistenz
 
-## [0.2.0] - 2024-12-18
+## [0.2.0] - 2025-08-10
 
 ### Hinzugefügt
 - Link für "Passwort vergessen" Funktionalität
@@ -32,7 +49,7 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Aktualisiertes Impressum
 - Kleinere UI-Verbesserungen
 
-## [0.1.0] - 2024-12-17
+## [0.1.0] - 2024-08-02
 
 ### Hinzugefügt
 - Backend-System mit Symfony Framework
