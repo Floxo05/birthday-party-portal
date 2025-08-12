@@ -58,7 +58,8 @@
 <!-- Sticky-Footer -->
 <footer class="bg-dark text-light text-center py-3 mt-auto small">
     <div class="container">
-        Dies ist ein privates Freizeitprojekt.
+        Dies ist ein privates Freizeitprojekt. -
+        Version: {{ app_version.getVersion() }}<br>
         <a href="{{ path('app_impressum') }}" class="link-light text-decoration-underline">Impressum</a> ·
         <a href="{{ path('app_privacy') }}" class="link-light text-decoration-underline">Datenschutz</a>
     </div>
