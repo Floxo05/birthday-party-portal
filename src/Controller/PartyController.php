@@ -30,66 +30,71 @@ final class PartyController extends AbstractController
     {
     }
 
-//    #[Route('/party/{id}', name: 'party_show')]
-//    public function show(
-//        Party $party,
-//        PartyNewsRepository $partyNewsRepository,
-//        PartyMemberRepository $partyMemberRepository,
-//        UserMessageStatusRepository $messageStatusRepository,
-//    ): Response {
-//        $user = $this->getUser();
-//
-//        if (!$user instanceof User)
-//        {
-//            throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
-//        }
-//
-//        if (!$partyMemberRepository->isUserInParty($user, $party))
-//        {
-//            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
-//        }
-//
-//        $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
-//
-//        /** @var PartyNews[] $news */
-//        $news = $partyNewsRepository->findBy(
-//            ['party' => $party],
-//            ['createdAt' => 'DESC'],
-//            3
-//        );
-//
-//        $userMessageStatus = $messageStatusRepository->findAllByUserAndPartyNews($user, $news);
-//        $statusMap = $this->getUserMessageStatusMap($userMessageStatus);
-//
-//        $popupNews = [];
-//        try
-//        {
-//            $popupNews = array_filter(
-//                $news,
-//                fn(PartyNews $news) => $news->getAsPopup()  // marked as popup
-//                    && !($statusMap[$news->getId()?->toRfc4122()]->isRead()) // news not read
-//            );
-//        } catch (\Exception $exception)
-//        {
-//            $this->logger->error(
-//                $exception->getMessage(),
-//                ['id' => $user->getId(), 'party' => $party->getId(), 'exception' => $exception]
-//            );
-//        }
-//
-//
-//        return $this->render('party/show.html.twig', [
-//            'party' => $party,
-//            'news' => $news,
-//            'currentUser' => $user,
-//            'statusMap' => $statusMap,
-//            'popupNews' => $popupNews,
-//        ]);
-//    }
+   #[Route('/party/{id}', name: 'party_show')]
+   public function show(
+       Party $party,
+       PartyNewsRepository $partyNewsRepository,
+       PartyMemberRepository $partyMemberRepository,
+       UserMessageStatusRepository $messageStatusRepository,
+   ): Response {
+       $user = $this->getUser();
+
+       if (!$user instanceof User)
+       {
+           throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
+       }
+
+       if (!$partyMemberRepository->isUserInParty($user, $party))
+       {
+           throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
+       }
+
+       if ($party->isForeshadowing())
+       {
+           return $this->redirectToRoute('party_foreshadowing', ['id' => $party->getId()]);
+       }
+
+       $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
+
+       /** @var PartyNews[] $news */
+       $news = $partyNewsRepository->findBy(
+           ['party' => $party],
+           ['createdAt' => 'DESC'],
+           3
+       );
+
+       $userMessageStatus = $messageStatusRepository->findAllByUserAndPartyNews($user, $news);
+       $statusMap = $this->getUserMessageStatusMap($userMessageStatus);
+
+       $popupNews = [];
+       try
+       {
+           $popupNews = array_filter(
+               $news,
+               fn(PartyNews $news) => $news->getAsPopup()  // marked as popup
+                   && !($statusMap[$news->getId()?->toRfc4122()]->isRead()) // news not read
+           );
+       } catch (\Exception $exception)
+       {
+           $this->logger->error(
+               $exception->getMessage(),
+               ['id' => $user->getId(), 'party' => $party->getId(), 'exception' => $exception]
+           );
+       }
 
 
-    #[Route('/party/{id}', name: 'party_show')]
-    public function show(
+       return $this->render('party/show.html.twig', [
+           'party' => $party,
+           'news' => $news,
+           'currentUser' => $user,
+           'statusMap' => $statusMap,
+           'popupNews' => $popupNews,
+       ]);
+   }
+
+
+    #[Route('/party/{id}/foreshadowing', name: 'party_foreshadowing')]
+    public function foreshadowing(
         Party $party,
         PartyMemberRepository $partyMemberRepository,
     ): Response {
@@ -103,6 +108,11 @@ final class PartyController extends AbstractController
         if (!$partyMemberRepository->isUserInParty($user, $party))
         {
             throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
+        }
+
+        if (!$party->isForeshadowing())
+        {
+            return $this->redirectToRoute('party_show', ['id' => $party->getId()]);
         }
 
         return $this->render('party/foreshadowing.html.twig', [
@@ -129,6 +139,11 @@ final class PartyController extends AbstractController
         if (!$partyMemberRepository->isUserInParty($user, $party))
         {
             throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
+        }
+
+        if ($party->isForeshadowing())
+        {
+            return $this->redirectToRoute('party_foreshadowing', ['id' => $party->getId()]);
         }
 
         $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));

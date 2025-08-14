@@ -12,6 +12,12 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
+## [0.4.0] - 2025-08-14
+
+### Neu
+- Foreshadowing für Partys: Eine Vorschau-Seite, auf die Party-Seiten umleiten, solange der Modus aktiv ist.
+- In der Administration pro Party ein- und ausschaltbar (standardmäßig aktiv).
+
 ## [0.3.0] - 2025-08-12
 
 ### Hinzugefügt

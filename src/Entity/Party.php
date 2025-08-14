@@ -67,6 +67,9 @@ class Party implements \Stringable
     #[Assert\NotBlank]
     private ?\DateTimeImmutable $rsvpDeadline = null;
 
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private bool $foreshadowing = true;
+
     public function __construct()
     {
         $this->partyMembers = new ArrayCollection();
@@ -252,5 +255,15 @@ class Party implements \Stringable
         return $this;
     }
 
+    public function isForeshadowing(): bool
+    {
+        return $this->foreshadowing;
+    }
 
+    public function setForeshadowing(bool $foreshadowing): static
+    {
+        $this->foreshadowing = $foreshadowing;
+
+        return $this;
+    }
 }
