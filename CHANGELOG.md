@@ -12,6 +12,18 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
+## [0.5.0] - 2025-09-12
+
+### Hinzugefügt
+- Seite „Zu-/Absage verwalten“ mit Optionen: Zusage, Absage, Zusage + X
+- Inline-Eingabefeld für „+X“ mit einblendbarem Info-Hinweis
+- Anzeige der aktuellen Entscheidung zur Partyteilnahme
+
+### Geändert
+- Validierung für „+X“: Es sind nur die Werte 1 oder 2 erlaubt
+- Auswahl nur bis zur Rückmeldefrist (`rsvpDeadline`) möglich
+- Einheitlicher, neutraler (gefüllter) Button-Stil für alle Aktionen
+
 ## [0.4.0] - 2025-08-14
 
 ### Neu

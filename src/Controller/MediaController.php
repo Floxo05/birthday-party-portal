@@ -3,13 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Media;
-use http\Exception\UnexpectedValueException;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use UnexpectedValueException;
 
 final class MediaController extends AbstractController
 {
