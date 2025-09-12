@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use UnexpectedValueException;
+use App\Attribute\RequiresPartyAccess;
 
 final class PartyController extends AbstractController
 {
@@ -35,24 +36,15 @@ final class PartyController extends AbstractController
     ) {}
 
     #[Route('/party/{id}', name: 'party_show')]
+    #[RequiresPartyAccess]
     public function show(
         Party $party,
         PartyNewsRepository $partyNewsRepository,
-        PartyMemberRepository $partyMemberRepository,
         UserMessageStatusRepository $messageStatusRepository,
     ): Response {
         $user = $this->getUser();
-
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
-        }
-
-        if (!$partyMemberRepository->isUserInParty($user, $party)) {
-            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
-        }
-
-        if ($party->isForeshadowing()) {
-            return $this->redirectToRoute('party_foreshadowing', ['id' => $party->getId()]);
         }
 
         $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
@@ -93,20 +85,14 @@ final class PartyController extends AbstractController
 
 
     #[Route('/party/{id}/foreshadowing', name: 'party_foreshadowing')]
+    #[RequiresPartyAccess(redirectIfForeshadowing: false)]
     public function foreshadowing(
         Party $party,
-        PartyMemberRepository $partyMemberRepository,
     ): Response {
         $user = $this->getUser();
-
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
         }
-
-        if (!$partyMemberRepository->isUserInParty($user, $party)) {
-            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
-        }
-
         if (!$party->isForeshadowing()) {
             return $this->redirectToRoute('party_show', ['id' => $party->getId()]);
         }
@@ -119,24 +105,15 @@ final class PartyController extends AbstractController
     }
 
     #[Route('/party/{id}/news', name: 'party_news_list')]
+    #[RequiresPartyAccess]
     public function newsList(
         Party $party,
         PartyNewsRepository $partyNewsRepository,
-        PartyMemberRepository $partyMemberRepository,
         UserMessageStatusRepository $messageStatusRepository,
     ): Response {
         $user = $this->getUser();
-
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
-        }
-
-        if (!$partyMemberRepository->isUserInParty($user, $party)) {
-            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
-        }
-
-        if ($party->isForeshadowing()) {
-            return $this->redirectToRoute('party_foreshadowing', ['id' => $party->getId()]);
         }
 
         $this->eventDispatcher->dispatch(new BeforeLoadDataForPartyEvent($user, $party));
@@ -157,9 +134,9 @@ final class PartyController extends AbstractController
     }
 
     #[Route('/party/news/{id}', name: 'party_news_detail')]
+    #[RequiresPartyAccess]
     public function newsDetail(
         PartyNews $news,
-        PartyMemberRepository $partyMemberRepository,
         UserMessageManager $userMessageManager
     ): Response {
         $user = $this->getUser();
@@ -168,38 +145,24 @@ final class PartyController extends AbstractController
             throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Nachricht zu sehen.');
         }
 
-        $party = $news->getParty();
-        if ($party === null) {
-            throw new UnexpectedValueException('Die Nachricht ist zu keiner Party zugeordnet.');
-        }
-
-        if (!$partyMemberRepository->isUserInParty($user, $party)) {
-            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Nachricht.');
-        }
-
         $userMessageManager->markAsRead($user, $news);
 
         return $this->render('party/news_detail.html.twig', [
             'news' => $news,
-            'party' => $party,
+            'party' => $news->getParty(),
         ]);
     }
 
     #[Route('/party/{id}/action/response', name: 'party_action_response')]
+    #[RequiresPartyAccess]
     public function manageResponse(
         Party $party,
-        PartyMemberRepository $partyMemberRepository,
         Request $request,
         PartyMembershipManagerInterface $partyMembershipManager,
     ): Response {
         $user = $this->getUser();
-
         if (!$user instanceof User) {
             throw $this->createAccessDeniedException('Du musst eingeloggt sein, um diese Party zu sehen.');
-        }
-
-        if (!$partyMemberRepository->isUserInParty($user, $party)) {
-            throw $this->createAccessDeniedException('Du hast keinen Zugriff auf diese Party.');
         }
 
         $now = new \DateTimeImmutable();
