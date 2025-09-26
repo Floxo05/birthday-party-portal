@@ -93,4 +93,9 @@ abstract class PartyMember
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return sprintf('PartyMember %s for Party %s, Role %s', $this->getUser()?->getName(), $this->getParty()?->getTitle(), $this->getRole());
+    }
 }

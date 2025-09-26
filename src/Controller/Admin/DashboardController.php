@@ -8,6 +8,8 @@ use App\Entity\Invitation;
 use App\Entity\Media;
 use App\Entity\Party;
 use App\Entity\PartyNews;
+use App\Entity\PartyGroup;
+use App\Entity\PartyGroupAssignment;
 use App\Entity\User;
 use App\Security\Role;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
@@ -45,6 +47,10 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Einladung', 'fa fa-envelope-open-text', Invitation::class);
         yield MenuItem::linkToCrud('Medien', 'fa fa-file', Media::class);
         yield MenuItem::linkToCrud('Nachrichten', 'fa fa-comments', PartyNews::class);
+        yield MenuItem::section('Gruppen');
+        yield MenuItem::linkToCrud('Gruppen', 'fa fa-users', PartyGroup::class);
+        yield MenuItem::linkToCrud('Gruppenzuweisungen', 'fa fa-user-plus', PartyGroupAssignment::class);
+        yield MenuItem::section('Super-Admin');
         yield MenuItem::linkToCrud('Nutzer', 'fa fa-user', User::class)
             ->setPermission(Role::ADMIN->value);
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
