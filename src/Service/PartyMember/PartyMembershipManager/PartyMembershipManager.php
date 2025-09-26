@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Service\PartyMember\PartyMembershipManager;
 
 use App\Entity\Invitation;
+use App\Entity\Party;
+use App\Entity\PartyMember;
 use App\Entity\User;
 use App\Enum\ResponseStatus;
 use App\Exception\Party\UserAlreadyInPartyException;
 use App\Repository\PartyMemberRepository;
 use App\Service\PartyMember\PartyMemberFactory\PartyMemberFactory;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Form\Party\PartyResponseFormModel;
 
 readonly class PartyMembershipManager implements PartyMembershipManagerInterface
 {
@@ -53,5 +56,34 @@ readonly class PartyMembershipManager implements PartyMembershipManagerInterface
         $this->entityManager->persist($partyMember);
         $this->entityManager->persist($invitation);
         $this->entityManager->flush();
+    }
+
+    public function setResponseForUser(User $user, Party $party, PartyResponseFormModel $model): void
+    {
+        $partyMember = $this->partyMemberRepository->findOneByUserAndParty($user, $party);
+
+        if (!$partyMember instanceof PartyMember)
+        {
+            throw new \RuntimeException('Mitgliedschaft nicht gefunden.');
+        }
+
+        if ($model->responseStatus === ResponseStatus::ACCEPTED)
+        {
+            $partyMember->setResponseStatus(ResponseStatus::ACCEPTED);
+            $partyMember->setExtraGuests($model->plusGuests);
+        }
+        elseif ($model->responseStatus === ResponseStatus::DECLINED)
+        {
+            $partyMember->setResponseStatus(ResponseStatus::DECLINED);
+            $partyMember->setExtraGuests(null);
+        }
+
+        $this->entityManager->persist($partyMember);
+        $this->entityManager->flush();
+    }
+
+    public function getMembershipForUser(User $user, Party $party): ?PartyMember
+    {
+        return $this->partyMemberRepository->findOneByUserAndParty($user, $party);
     }
 }

@@ -62,10 +62,19 @@ class Party implements \Stringable
     #[ORM\OneToMany(targetEntity: PartyNews::class, mappedBy: 'party', orphanRemoval: true)]
     private Collection $partyNews;
 
+    /**
+     * @var Collection<int, PartyGroup>
+     */
+    #[ORM\OneToMany(targetEntity: PartyGroup::class, mappedBy: 'party', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $groups;
+
     #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
     #[Assert\Expression('this.getRsvpDeadline() < this.getPartyDate()')]
     #[Assert\NotBlank]
     private ?\DateTimeImmutable $rsvpDeadline = null;
+
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private bool $foreshadowing = true;
 
     public function __construct()
     {
@@ -73,11 +82,44 @@ class Party implements \Stringable
         $this->invitations = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->partyNews = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     public function getId(): ?Uuid
     {
         return $this->id;
+    }
+
+    /**
+     * @return Collection<int, PartyGroup>
+     */
+    public function getGroups(): Collection
+    {
+        return $this->groups;
+    }
+
+    public function addGroup(PartyGroup $group): static
+    {
+        if (!$this->groups->contains($group))
+        {
+            $this->groups->add($group);
+            $group->setParty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(PartyGroup $group): static
+    {
+        if ($this->groups->removeElement($group))
+        {
+            if ($group->getParty() === $this)
+            {
+                $group->setParty(null);
+            }
+        }
+
+        return $this;
     }
 
     public function getPartyDate(): ?\DateTimeInterface
@@ -252,5 +294,15 @@ class Party implements \Stringable
         return $this;
     }
 
+    public function isForeshadowing(): bool
+    {
+        return $this->foreshadowing;
+    }
 
+    public function setForeshadowing(bool $foreshadowing): static
+    {
+        $this->foreshadowing = $foreshadowing;
+
+        return $this;
+    }
 }

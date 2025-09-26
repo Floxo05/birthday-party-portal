@@ -20,6 +20,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "@hotwired/stimulus": "^3.2.2",
         "@popperjs/core": "^2.11.8",
         "bootstrap": "^5.3.3"
     }

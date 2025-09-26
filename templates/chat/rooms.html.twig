@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chats – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-link">← Zurück zur Party</a>
+        <h1 class="h4">Alle Chats</h1>
+    </section>
+
+    <div class="list-group">
+        {% for room in rooms %}
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="{{ path('chat_room_owner', { id: party.id, ownerId: room.owner.id }) }}">
+                <div class="d-flex flex-column">
+                    <strong>{{ room.owner.name }}</strong>
+                    <small class="text-muted">Letzte Aktivität: {{ room.lastAt|date('d.m.Y H:i') }} · Nachrichten: {{ room.messageCount }}</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">Chat öffnen</span>
+            </a>
+        {% else %}
+            <p class="text-muted">Noch keine Chats vorhanden.</p>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+

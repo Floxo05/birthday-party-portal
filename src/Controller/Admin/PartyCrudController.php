@@ -20,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
@@ -49,6 +50,7 @@ class PartyCrudController extends AbstractCrudController
         yield TextField::new('title', 'party.crud.field.title');
         yield DateField::new('partyDate', 'party.crud.field.date');
         yield DateField::new('rsvpDeadline', 'party.crud.field.rsvpDeadline');
+        yield BooleanField::new('foreshadowing', 'Foreshadowing aktiv');
         yield CollectionField::new('invitations', 'party.crud.field.invitations')
             ->onlyOnDetail()
             ->formatValue(function ($value, Party $entity)

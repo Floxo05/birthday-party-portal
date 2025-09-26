@@ -17,7 +17,13 @@
     </section>
 
     <section class="mb-2 pb-2 border-bottom">
-        <h2 class="h4 mb-3 text-primary">Nachrichten</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 m-0 text-primary">Nachrichten</h2>
+            {% set membership = party.partyMembers|filter(m => m.user == currentUser)|first %}
+            {% if membership and membership.role == 'Host' %}
+                <a href="{{ path('chat_rooms_list', {id: party.id}) }}" class="btn btn-sm btn-outline-secondary">Alle Chats</a>
+            {% endif %}
+        </div>
 
         {% include 'party/_news_summary.html.twig' with { 'news': news, 'statusMap': statusMap } %}
 

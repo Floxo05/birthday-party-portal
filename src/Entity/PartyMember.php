@@ -36,6 +36,9 @@ abstract class PartyMember
     #[ORM\Column(enumType: ResponseStatus::class, options: ['default' => ResponseStatus::PENDING])]
     private ?ResponseStatus $responseStatus = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $extraGuests = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -77,5 +80,22 @@ abstract class PartyMember
         $this->responseStatus = $responseStatus;
 
         return $this;
+    }
+
+    public function getExtraGuests(): ?int
+    {
+        return $this->extraGuests;
+    }
+
+    public function setExtraGuests(?int $extraGuests): static
+    {
+        $this->extraGuests = $extraGuests;
+
+        return $this;
+    }
+
+    public function __toString(): string
+    {
+        return sprintf('PartyMember %s for Party %s, Role %s', $this->getUser()?->getName(), $this->getParty()?->getTitle(), $this->getRole());
     }
 }

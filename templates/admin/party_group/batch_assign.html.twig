@@ -1,0 +1,57 @@
+{% extends '@EasyAdmin/layout.html.twig' %}
+
+{% block content_title %}
+    Mitglieder zu Gruppe "{{ group.name }}" zuweisen
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Party: {{ party.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Verfügbare Mitglieder:</label>
+                            <div class="row">
+                                {% for member in partyMembers %}
+                                    <div class="col-md-6 col-lg-4 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   name="selected_members[]" 
+                                                   value="{{ member.id }}" 
+                                                   id="member_{{ member.id }}"
+                                                   {% if member.id.toString in assignedMemberIds %}checked{% endif %}>
+                                            <label class="form-check-label" for="member_{{ member.id }}">
+                                                <strong>{{ member.user.name }}</strong>
+                                                <small class="text-muted d-block">
+                                                    {{ member.role }} 
+                                                    {% if member.responseStatus %}
+                                                        - {{ member.responseStatus.value }}
+                                                    {% endif %}
+                                                </small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i> Zuweisungen speichern
+                            </button>
+                            <a href="{{ ea_url().setController('App\\Controller\\Admin\\PartyGroupCrudController').setAction('detail').setEntityId(group.id) }}" 
+                               class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Zurück zur Gruppe
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

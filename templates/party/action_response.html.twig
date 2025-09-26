@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Zu-/Absage verwalten{% endblock %}
+
+{% block body %}
+    <div class="container d-flex justify-content-center">
+        <div class="card p-4 shadow-lg" style="max-width: 400px; width: 100%;">
+            <h2 class="text-center mb-3">{{ party.title }}</h2>
+
+            {% if not isRsvpOpen %}
+                <div class="alert alert-warning">Die Zu-/Absage ist nicht mehr möglich.</div>
+            {% endif %}
+
+            {% if currentDecision %}
+                <div class="alert alert-info mb-3">Aktuelle Entscheidung: {{ currentDecision }}</div>
+            {% endif %}
+
+            {% if form is defined and form %}
+                {{ form_start(form) }}
+                <div class="d-grid gap-2">
+                    {{ form_widget(form.accept, {'attr': {'class': 'btn btn-secondary w-100'}}) }}
+                    {{ form_widget(form.accept_with_guests, {'attr': {'class': 'btn btn-primary w-100'}}) }}
+                    {{ form_widget(form.decline, {'attr': {'class': 'btn btn-outline-secondary w-100'}}) }}
+                </div>
+                {{ form_end(form) }}
+            {% endif %}
+
+            <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-link mt-3 w-100">Zurück zur Party</a>
+        </div>
+    </div>
+{% endblock %}
+

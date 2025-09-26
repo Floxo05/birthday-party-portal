@@ -1,5 +1,9 @@
 import 'bootstrap';
 import '@popperjs/core';
 
-// register any custom, 3rd party controllers here
-// app.register('some_controller_name', SomeImportedController);
+import { Application } from '@hotwired/stimulus';
+import ChatController from './controllers/chat_controller.js';
+
+// Initialize Stimulus and register controllers
+window.Stimulus = window.Stimulus || Application.start();
+window.Stimulus.register('chat', ChatController);
