@@ -12,6 +12,16 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
+## [0.5.1] - 2025-09-26
+
+### Hinzugefügt
+- Emoji-Anzeige beim aktuellen Responsestatus: „🙂“ für Zusage, „🙁“ sonst
+
+### Geändert
+- Zusage-Seite: Zahleneingabe entfernt, ein einzelner Button „Zusage + 1“
+- Controller: Bei „Zusage + 1“ wird automatisch `plusGuests = 1` gesetzt
+- Template `party/action_response.html.twig`: Bereinigt – nur noch drei Buttons, kein Zahleneingabefeld
+
 ## [0.5.0] - 2025-09-12
 
 ### Hinzugefügt

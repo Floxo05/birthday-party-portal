@@ -1,56 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Antwort verwalten{% endblock %}
+{% block title %}Zu-/Absage verwalten{% endblock %}
 
 {% block body %}
-    <div class="container mt-4">
-        <h1>Zu-/Absage verwalten</h1>
+    <div class="container d-flex justify-content-center">
+        <div class="card p-4 shadow-lg" style="max-width: 400px; width: 100%;">
+            <h2 class="text-center mb-3">{{ party.title }}</h2>
 
-        <p>Wähle bitte deine Antwort für die Party <strong>{{ party.title ?? 'Party' }}</strong> aus.</p>
+            {% if not isRsvpOpen %}
+                <div class="alert alert-warning">Die Zu-/Absage ist nicht mehr möglich.</div>
+            {% endif %}
 
-        {% if currentDecision %}
-            <div class="alert alert-secondary">Aktuelle Auswahl: {{ currentDecision }}</div>
-        {% endif %}
+            {% if currentDecision %}
+                <div class="alert alert-info mb-3">Aktuelle Entscheidung: {{ currentDecision }}</div>
+            {% endif %}
 
-        {% if isRsvpOpen %}
-            {{ form_start(form) }}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <div class="d-grid gap-2 mb-3">
-                        {{ form_widget(form.accept) }}
-                        {{ form_widget(form.decline) }}
-                    </div>
-
-                    <div class="row g-2 align-items-center w-100">
-                        <div class="col">
-                            {{ form_widget(form.accept_with_guests) }}
-                        </div>
-                        <div class="col-auto" style="width: 60px;">
-                            {{ form_widget(form.plusGuests, { attr: { style: 'width: 100%;' } }) }}
-                        </div>
-                        <div class="col-auto" style="width: 40px; text-align: center;">
-                            <span class="badge bg-info" data-bs-toggle="collapse" href="#plus-info" role="button" aria-expanded="false" aria-controls="plus-info">i</span>
-                        </div>
-                        <div class="col-12">
-                            <div class="collapse mt-2" id="plus-info">
-                                <div class="alert alert-info" role="alert">
-                                    Bei <strong>Zusage + X</strong>: Deine Begleitpersonen können sich gern über den Einladungslink
-                                    einen eigenen Account anlegen, um selbst auf die Inhalte zugreifen zu können.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {% if form is defined and form %}
+                {{ form_start(form) }}
+                <div class="d-grid gap-2">
+                    {{ form_widget(form.accept, {'attr': {'class': 'btn btn-secondary w-100'}}) }}
+                    {{ form_widget(form.accept_with_guests, {'attr': {'class': 'btn btn-primary w-100'}}) }}
+                    {{ form_widget(form.decline, {'attr': {'class': 'btn btn-outline-secondary w-100'}}) }}
                 </div>
-            </div>
-            {{ form_end(form) }}
-        {% else %}
-            <div class="alert alert-warning">
-                Die Rückmeldefrist ({{ party.rsvpDeadline ? party.rsvpDeadline|date('d.m.Y') : 'unbekannt' }}) ist abgelaufen. Änderungen sind nicht mehr möglich.
-            </div>
-        {% endif %}
+                {{ form_end(form) }}
+            {% endif %}
 
-        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-link">Zurück zur Party</a>
+            <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-link mt-3 w-100">Zurück zur Party</a>
+        </div>
     </div>
 {% endblock %}
-
 

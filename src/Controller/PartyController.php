@@ -186,18 +186,7 @@ final class PartyController extends AbstractController
                     $formModel->plusGuests = null;
                 } elseif ($acceptWithGuests instanceof ClickableInterface && $acceptWithGuests->isClicked()) {
                     $formModel->responseStatus = ResponseStatus::ACCEPTED;
-                    $formModel->plusGuests = (int)($form->get('plusGuests')->getData());
-
-                    if (!in_array($formModel->plusGuests, [1, 2], true)) {
-                        $form->get('plusGuests')->addError(new \Symfony\Component\Form\FormError('Bitte gib 1 oder 2 ein.'));
-                        return $this->render('party/action_response.html.twig', [
-                            'party' => $party,
-                            'currentUser' => $user,
-                            'isRsvpOpen' => $isRsvpOpen,
-                            'form' => $form->createView(),
-                            'currentDecision' => null,
-                        ]);
-                    }
+                    $formModel->plusGuests = 1;
                 } elseif ($decline instanceof ClickableInterface && $decline->isClicked()) {
                     $formModel->responseStatus = ResponseStatus::DECLINED;
                     $formModel->plusGuests = null;
@@ -232,10 +221,11 @@ final class PartyController extends AbstractController
             $extras = $membership->getExtraGuests();
             if ($status !== null) {
                 $label = $status->getLabel();
+                $emoji = $status === ResponseStatus::ACCEPTED ? ' 🙂' : ' 🙁';
                 if ($status === ResponseStatus::ACCEPTED && $extras) {
-                    $currentDecision = sprintf('%s + %d', $label, $extras);
+                    $currentDecision = sprintf('%s + %d%s', $label, $extras, $emoji);
                 } else {
-                    $currentDecision = $label;
+                    $currentDecision = $label . $emoji;
                 }
             }
         }
