@@ -33,6 +33,9 @@ class PartyResponseFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => PartyResponseFormModel::class,
+            'csrf_protection' => true,
+            'csrf_field_name' => '_token',
+            'csrf_token_id'   => 'party_response_form',
         ]);
     }
 }

@@ -12,6 +12,11 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
+## [0.5.2] - 2025-09-26
+
+### Geändert
+- CRSF-Token in Zusage-Form hinzugefügt für richtige Formvalidierung
+
 ## [0.5.1] - 2025-09-26
 
 ### Hinzugefügt
