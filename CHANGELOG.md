@@ -12,6 +12,21 @@ und dieses Projekt hält sich an [Semantic Versioning](https://semver.org/lang/d
 - Shop mit virtuellen und echten Belohnungen
 - Vollständige Party-Detail-Ansicht mit allen Funktionen
 
+## [0.6.0] - 2025-09-26
+
+### Hinzugefügt
+- Einfaches Chat-System (MVP) pro Person und Party (Polling-basiert)
+  - Entität `ChatMessage` inkl. Migration
+  - Routen/Controller: Raum-Ansicht, Nachrichten-JSON (GET/POST)
+  - Stimulus-Controller für Polling und Senden
+  - Mobile-optimierte Darstellung (Bubbles, kompaktes Zeitformat)
+  - Host-Übersicht „Alle Chats“: Liste aller Räume nach letzter Aktivität sortiert
+
+### Geändert
+- Party-Seite: Aktion „Nachricht an Host senden“ aktiviert und verlinkt
+- Zugriffskontrolle: Nur Partymitglieder sehen Chats; Schreiben/Lesen nur Raum-Owner oder Hosts
+- Repository-Logik: Raum-Aggregation serverseitig in PHP zur Vermeidung von UUID/IDENTITY-Problemen
+
 ## [0.5.2] - 2025-09-26
 
 ### Geändert

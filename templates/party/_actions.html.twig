@@ -1,5 +1,5 @@
 <div class="d-grid gap-2">
     <a class="btn btn-primary" href="{{ path('party_action_response', { id: party.id }) }}">Zu-/Absage verwalten</a>
-    <button class="btn btn-outline-secondary" disabled>Nachricht an Host senden (bald verfügbar)</button>
+    <a class="btn btn-outline-secondary" href="{{ path('chat_room_self', { id: party.id }) }}">Nachricht an Host senden</a>
     <button class="btn btn-outline-success" disabled>Zum Shop (bald verfügbar)</button>
 </div>

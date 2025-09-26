@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chat – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-link">← Zurück zur Party</a>
+        <h1 class="h4">Chat mit Gastgebern – Raum von {{ roomOwner.name }}</h1>
+    </section>
+
+    <div id="chat"
+         data-controller="chat"
+         data-chat-party-id-value="{{ party.id }}"
+         data-chat-owner-id-value="{{ roomOwner.id }}"
+         data-chat-fetch-url-value="{{ path('chat_messages_list', { id: party.id, ownerId: roomOwner.id }) }}"
+         data-chat-post-url-value="{{ path('chat_messages_post', { id: party.id, ownerId: roomOwner.id }) }}">
+
+        <div id="chat-messages" class="border rounded p-2 p-sm-3 mb-3" style="height: 55vh; overflow-y: auto;"></div>
+
+        <form id="chat-form" data-action="submit->chat#send" class="d-flex gap-2">
+            <input class="form-control" type="text" name="content" placeholder="Nachricht schreiben…" autocomplete="off" required>
+            <button class="btn btn-primary" type="submit">Senden</button>
+        </form>
+    </div>
+
+    {# Stimulus ist global via assets/bootstrap.js registriert #}
+{% endblock %}
+
+
