@@ -17,6 +17,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -39,7 +40,18 @@ class PartyGroupCrudController extends AbstractHostCrudController
                 return $entity !== null;
             });
 
+        $foodVotingAction = Action::new('foodVoting', 'Essensabstimmung')
+            ->linkToUrl(function ($entity) {
+                return '/food-voting/group/' . $entity->getId();
+            })
+            ->addCssClass('btn btn-success')
+            ->setIcon('fa fa-utensils')
+            ->displayIf(function ($entity) {
+                return $entity !== null && $entity->getIsFoodVotingGroup();
+            });
+
         $actions->add(Crud::PAGE_DETAIL, $batchAssignAction);
+        $actions->add(Crud::PAGE_DETAIL, $foodVotingAction);
 
         return $actions;
     }
@@ -48,6 +60,7 @@ class PartyGroupCrudController extends AbstractHostCrudController
     {
         yield TextField::new('name', 'Name');
         yield AssociationField::new('party', 'Party');
+        yield BooleanField::new('isFoodVotingGroup', 'Essensabstimmung aktiviert');
         yield AssociationField::new('assignments', 'Zuweisungen')
             ->onlyOnDetail();
     }

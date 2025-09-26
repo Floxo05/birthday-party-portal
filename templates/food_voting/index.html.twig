@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Essensplanung - {{ group.name }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title mb-0">
+                        <i class="fa fa-utensils"></i> Essensplanung: {{ group.name }}
+                    </h2>
+                    <small class="text-muted">Party: {{ group.party.title }}</small>
+                </div>
+                <div class="card-body">
+                    <!-- Add new food item -->
+                    <div class="mb-4">
+                        <h4>Essen hinzufügen</h4>
+                        <form method="post" class="row g-3">
+                            <input type="hidden" name="action" value="add">
+                            <div class="col-md-6">
+                                <label for="food_item" class="form-label">Was bringst du mit? *</label>
+                                <input type="text" class="form-control" id="food_item" name="food_item" 
+                                       placeholder="z.B. Kartoffelsalat" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="description" class="form-label">Beschreibung (optional)</label>
+                                <input type="text" class="form-control" id="description" name="description" 
+                                       placeholder="z.B. mit Mayonnaise">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-plus"></i> Hinzufügen
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <hr>
+
+                    <!-- Food votes list -->
+                    <h4>Essensliste</h4>
+                    {% if foodVotes is empty %}
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> Noch keine Essensvorschläge vorhanden.
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            {% for vote in foodVotes %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ vote.foodItem }}</h6>
+                                            {% if vote.description %}
+                                                <p class="card-text text-muted small">{{ vote.description }}</p>
+                                            {% endif %}
+                                            <small class="text-muted">
+                                                <i class="fa fa-user"></i> {{ vote.partyMember.user.name }}
+                                                <br>
+                                                <i class="fa fa-clock"></i> {{ vote.createdAt|date('d.m.Y H:i') }}
+                                            </small>
+                                        </div>
+                                        {% if vote.partyMember == partyMember %}
+                                            <div class="card-footer bg-light">
+                                                <div class="btn-group w-100" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                            data-bs-toggle="modal" data-bs-target="#editModal{{ vote.id }}">
+                                                        <i class="fa fa-edit"></i> Bearbeiten
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                            onclick="confirmDelete('{{ vote.id }}', '{{ vote.foodItem|e('js') }}')">
+                                                        <i class="fa fa-trash"></i> Löschen
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Edit Modal -->
+                                <div class="modal fade" id="editModal{{ vote.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Essen bearbeiten</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="post">
+                                                <div class="modal-body">
+                                                    <input type="hidden" name="action" value="edit">
+                                                    <input type="hidden" name="vote_id" value="{{ vote.id }}">
+                                                    <div class="mb-3">
+                                                        <label for="edit_food_item_{{ vote.id }}" class="form-label">Essen *</label>
+                                                        <input type="text" class="form-control" id="edit_food_item_{{ vote.id }}" 
+                                                               name="food_item" value="{{ vote.foodItem }}" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="edit_description_{{ vote.id }}" class="form-label">Beschreibung</label>
+                                                        <input type="text" class="form-control" id="edit_description_{{ vote.id }}" 
+                                                               name="description" value="{{ vote.description }}">
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                                                    <button type="submit" class="btn btn-primary">Speichern</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Essen löschen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Möchten Sie das Essen "<span id="deleteFoodName"></span>" wirklich löschen?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <form method="post" style="display: inline;">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="vote_id" id="deleteVoteId">
+                    <button type="submit" class="btn btn-danger">Löschen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(voteId, foodName) {
+    document.getElementById('deleteVoteId').value = voteId;
+    document.getElementById('deleteFoodName').textContent = foodName;
+    
+    // Check if Bootstrap is available
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    } else {
+        // Fallback: use vanilla JavaScript to show modal
+        const modal = document.getElementById('deleteModal');
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Add backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = 'modal-backdrop';
+        document.body.appendChild(backdrop);
+        
+        // Close modal when clicking backdrop
+        backdrop.addEventListener('click', function() {
+            closeModal();
+        });
+        
+        // Close modal when clicking close button
+        modal.querySelector('.btn-close').addEventListener('click', function() {
+            closeModal();
+        });
+        
+        // Close modal when clicking cancel button
+        modal.querySelector('.btn-secondary').addEventListener('click', function() {
+            closeModal();
+        });
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('deleteModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    
+    const backdrop = document.getElementById('modal-backdrop');
+    if (backdrop) {
+        backdrop.remove();
+    }
+}
+</script>
+{% endblock %}

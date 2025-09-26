@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Party;
+use App\Entity\PartyGroup;
 use App\Entity\PartyNews;
 use App\Entity\User;
 use App\Entity\UserMessageStatus;
@@ -80,6 +81,7 @@ final class PartyController extends AbstractController
             'currentUser' => $user,
             'statusMap' => $statusMap,
             'popupNews' => $popupNews,
+            'foodVotingGroup' => $this->getFoodVotingGroupForUser($party, $user),
         ]);
     }
 
@@ -258,5 +260,35 @@ final class PartyController extends AbstractController
         }
 
         return $statusMap;
+    }
+
+    private function getFoodVotingGroupForUser(Party $party, User $user): ?PartyGroup
+    {
+        // Find the user's party member record
+        $partyMember = null;
+        foreach ($party->getPartyMembers() as $member) {
+            if ($member->getUser() === $user) {
+                $partyMember = $member;
+                break;
+            }
+        }
+
+        if (!$partyMember) {
+            return null;
+        }
+
+        // Check if user is in any food voting group
+        foreach ($party->getGroups() as $group) {
+            if ($group->getIsFoodVotingGroup()) {
+                // Check if user is assigned to this group
+                foreach ($group->getAssignments() as $assignment) {
+                    if ($assignment->getPartyMember() === $partyMember) {
+                        return $group;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

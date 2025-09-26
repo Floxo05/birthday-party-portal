@@ -28,6 +28,9 @@ class PartyGroup
     #[ORM\Column(type: Types::STRING, length: 255)]
     private ?string $name = null;
 
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => false])]
+    private ?bool $isFoodVotingGroup = null;
+
     /**
      * @var Collection<int, PartyGroupAssignment>
      */
@@ -64,6 +67,18 @@ class PartyGroup
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getIsFoodVotingGroup(): ?bool
+    {
+        return $this->isFoodVotingGroup;
+    }
+
+    public function setIsFoodVotingGroup(bool $isFoodVotingGroup): static
+    {
+        $this->isFoodVotingGroup = $isFoodVotingGroup;
 
         return $this;
     }
