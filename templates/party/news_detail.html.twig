@@ -7,7 +7,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body d-flex flex-column">
-            <h5 class="card-title">{{ news.text }}</h5>
+            <h5 class="card-title">{{ news.text|nl2br }}</h5>
 
             {% if news.media %}
                 <img src="{{ path('app_media_view', {id: news.media.id}) }}"
