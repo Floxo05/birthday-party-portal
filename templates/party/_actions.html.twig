@@ -2,6 +2,10 @@
     <a class="btn btn-primary" href="{{ path('party_action_response', { id: party.id }) }}">Zu-/Absage verwalten</a>
     <a class="btn btn-outline-secondary" href="{{ path('chat_room_self', { id: party.id }) }}">Nachricht an Host senden</a>
     
+    <a class="btn btn-warning" href="{{ path('party_clash_entry', { id: party.id }) }}">
+        <i class="fa fa-bolt"></i> Clash
+    </a>
+    
     {% if foodVotingGroup is not null %}
         <a class="btn btn-success" href="{{ path('app_food_voting', { id: foodVotingGroup.id }) }}">
             <i class="fa fa-utensils"></i> Essensplanung

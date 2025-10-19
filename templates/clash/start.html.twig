@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – Start{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    {% set myTeam = team %}
+    {% set oppTeam = team == 'A' ? 'B' : 'A' %}
+    {% set tn = teamNames ?? {'A':'A','B':'B'} %}
+    {% set colorMy = myTeam == 'A' ? 'primary' : 'danger' %}
+    {% set colorOpp = myTeam == 'A' ? 'danger' : 'primary' %}
+    {% set imgA = asset('media/clash/teamA.png') %}
+    {% set imgB = asset('media/clash/teamB.png') %}
+
+    <style>
+        /* Subtle glow for my team */
+        .clash-highlight-primary { box-shadow: 0 0 0.75rem rgba(0,0,0,.08), 0 0 1rem var(--bs-primary); border-width: 2px !important; transform: translateY(-2px); }
+        .clash-highlight-danger  { box-shadow: 0 0 0.75rem rgba(0,0,0,.08), 0 0 1rem var(--bs-danger);  border-width: 2px !important; transform: translateY(-2px); }
+        .vs-badge { font-weight: 800; letter-spacing: .08em; }
+        .member-list { max-height: 220px; overflow: auto; }
+    </style>
+
+    <h1 class="mb-2">Clash</h1>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <p class="lead mb-3">
+        Du bist <span class="badge bg-{{ colorMy }}">Team {{ tn[myTeam] }}</span>
+        und trittst an gegen <span class="badge bg-{{ colorOpp }}">Team {{ tn[oppTeam] }}</span>.
+    </p>
+
+    <div class="row g-3 align-items-stretch mt-2">
+        {# Order dynamically: my team card first #}
+        <div class="col-12 col-md-5 order-1 order-md-1">
+            {% if myTeam == 'A' %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'A',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersA,
+                    isMyTeam: true,
+                    color: colorMy,
+                    img: imgA,
+                    collapseId: 'teamAList'
+                } only %}
+            {% else %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'B',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersB,
+                    isMyTeam: true,
+                    color: colorMy,
+                    img: imgB,
+                    collapseId: 'teamBList'
+                } only %}
+            {% endif %}
+        </div>
+
+        <div class="col-12 col-md-2 order-2 order-md-2 d-flex align-items-center justify-content-center">
+            <span class="vs-badge badge bg-dark text-uppercase px-3 py-2">VS</span>
+        </div>
+
+        <div class="col-12 col-md-5 order-3 order-md-3">
+            {% if myTeam == 'A' %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'B',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersB,
+                    isMyTeam: false,
+                    color: colorOpp,
+                    img: imgB,
+                    collapseId: 'teamBList'
+                } only %}
+            {% else %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'A',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersA,
+                    isMyTeam: false,
+                    color: colorOpp,
+                    img: imgA,
+                    collapseId: 'teamAList'
+                } only %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4 d-grid gap-2 d-md-block">
+        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zur Party</a>
+    </div>
+</div>
+{% endblock %}

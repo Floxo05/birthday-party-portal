@@ -1,0 +1,37 @@
+{# Reusable card for a clash team #}
+{#
+  Expected variables:
+  - side: 'A' or 'B'
+  - tn: map with team names {'A': 'Flo', 'B': 'Malte'}
+  - counts: map with member counts
+  - members: iterable of PartyMember
+  - isMyTeam: bool
+  - color: Bootstrap color name string (e.g., 'primary' | 'danger')
+  - img: asset url for team image
+  - collapseId: unique DOM id for the members collapse
+#}
+<div class="card border-{{ color }} h-100 {{ isMyTeam ? ('clash-highlight-' ~ color) : '' }}">
+    <div class="row g-0 align-items-center">
+        <div class="col-3 p-2 text-center">
+            <img src="{{ img }}" alt="Team {{ tn[side] }}" class="img-fluid rounded" style="max-height:80px">
+        </div>
+        <div class="col-9">
+            <div class="card-body py-3">
+                <h5 class="card-title mb-1">Team {{ tn[side] }} {% if isMyTeam %}<span class="badge bg-{{ color }} ms-1">Dein Team</span>{% endif %}</h5>
+                <div class="small text-muted">Mitglieder: {{ counts[side] ?? 0 }}</div>
+                <button class="btn btn-sm btn-outline-{{ isMyTeam ? color : 'secondary' }} mt-2" type="button" data-bs-toggle="collapse" data-bs-target="#{{ collapseId }}" aria-expanded="false" aria-controls="{{ collapseId }}">
+                    Mitglieder anzeigen
+                </button>
+                <div class="collapse mt-2" id="{{ collapseId }}">
+                    <ul class="list-group list-group-flush member-list">
+                        {% for m in members %}
+                            <li class="list-group-item py-2"><i class="fa fa-user text-{{ color }} me-2"></i>{{ m.user.name ?? m.user.username }}</li>
+                        {% else %}
+                            <li class="list-group-item text-muted">Noch keine Mitglieder</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
