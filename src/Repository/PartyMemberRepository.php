@@ -75,6 +75,27 @@ class PartyMemberRepository extends ServiceEntityRepository
         return $result;
     }
 
+    public function getTeamPoints(Party $party): array
+    {
+        $qb = $this->createQueryBuilder('pm')
+            ->select('pm.clashTeam AS team, SUM(pm.clashPoints) AS pts')
+            ->where('pm.party = :party')
+            ->andWhere('pm.clashTeam IS NOT NULL')
+            ->groupBy('pm.clashTeam')
+            ->setParameter('party', $party->getId(), UuidType::NAME);
+        $rows = $qb->getQuery()->getArrayResult();
+        $result = ['A' => 0, 'B' => 0];
+        foreach ($rows as $row)
+        {
+            $t = $row['team'];
+            if (isset($result[$t]))
+            {
+                $result[$t] = (int)($row['pts'] ?? 0);
+            }
+        }
+        return $result;
+    }
+
     public function findMembersByPartyAndTeam(Party $party, string $team): array
     {
         return $this->createQueryBuilder('pm')

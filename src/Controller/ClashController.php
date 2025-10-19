@@ -10,7 +10,6 @@ use App\Entity\User;
 use App\Repository\PartyMemberRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -109,12 +108,14 @@ class ClashController extends AbstractController
         }
 
         $counts = $this->partyMembers->getTeamCounts($party);
+        $points = $this->partyMembers->getTeamPoints($party);
         $membersA = $this->partyMembers->findMembersByPartyAndTeam($party, 'A');
         $membersB = $this->partyMembers->findMembersByPartyAndTeam($party, 'B');
         return $this->render('clash/start.html.twig', [
             'party' => $party,
             'team' => $pm->getClashTeam(),
             'counts' => $counts,
+            'teamPoints' => $points,
             'teamMembersA' => $membersA,
             'teamMembersB' => $membersB,
             'teamNames' => $this->getTeamNames(),

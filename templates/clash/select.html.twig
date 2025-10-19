@@ -4,7 +4,32 @@
 
 {% block body %}
 <div class="container py-4">
-    <h1>Clash: Wähle dein Team</h1>
+    {% set tn_head = teamNames ?? {'A':'A','B':'B'} %}
+    <style>
+        .clash-title {
+            font-weight: 900;
+            letter-spacing: .02em;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0.15rem 0.15rem rgba(0, 0, 0, .08));
+        }
+
+        .clash-title-accent {
+            height: 4px;
+            width: 140px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            opacity: .85;
+        }
+    </style>
+    <div class="d-flex align-items-baseline gap-2 mb-1">
+        <h1 class="clash-title mb-0">Clash</h1>
+    </div>
+    <div class="text-muted small">Team {{ tn_head['A'] }} vs Team {{ tn_head['B'] }}</div>
+    <div class="clash-title-accent mb-2"></div>
+    <h2 class="h5 mt-2">Wähle dein Team</h2>
     <p class="text-muted">Entscheide dich für eine Seite. Deine Wahl ist endgültig.</p>
 
     {% for label, messages in app.flashes %}
@@ -27,7 +52,7 @@
                     <h5 class="card-title">Team {{ tn['A'] }}</h5>
                     <p class="card-text text-muted">Mitglieder: {{ aCount }}</p>
                     <div class="mt-auto">
-                        <a class="btn btn-primary w-100 {% if lockedTo is not null and lockedTo != 'A' %}disabled{% endif %}"
+                        <a class="btn btn-danger w-100 {% if lockedTo is not null and lockedTo != 'A' %}disabled{% endif %}"
                            href="{{ path('party_clash_select', { id: party.id, side: 'A' }) }}">
                             Team {{ tn['A'] }} wählen
                         </a>
