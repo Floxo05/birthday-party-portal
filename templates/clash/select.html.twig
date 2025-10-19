@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – Team wählen{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    {% set tn_head = teamNames ?? {'A':'A','B':'B'} %}
+    <style>
+        .clash-title {
+            font-weight: 900;
+            letter-spacing: .02em;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0.15rem 0.15rem rgba(0, 0, 0, .08));
+        }
+
+        .clash-title-accent {
+            height: 4px;
+            width: 140px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            opacity: .85;
+        }
+    </style>
+    <div class="d-flex align-items-baseline gap-2 mb-1">
+        <h1 class="clash-title mb-0">Clash</h1>
+    </div>
+    <div class="text-muted small">Team {{ tn_head['A'] }} vs Team {{ tn_head['B'] }}</div>
+    <div class="clash-title-accent mb-2"></div>
+    <h2 class="h5 mt-2">Wähle dein Team</h2>
+    <p class="text-muted">Entscheide dich für eine Seite. Deine Wahl ist endgültig.</p>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    {% set tn = teamNames ?? {'A':'A','B':'B'} %}
+    {% set aCount = counts['A'] ?? 0 %}
+    {% set bCount = counts['B'] ?? 0 %}
+    {% set diff = (aCount - bCount)|abs %}
+    {% set lockedTo = (diff >= 5) ? (aCount <= bCount ? 'A' : 'B') : null %}
+
+    <div class="row g-4 mt-3">
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <img src="{{ asset('media/clash/teamA.png') }}" class="card-img-top" alt="Team {{ tn['A'] }}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Team {{ tn['A'] }}</h5>
+                    <p class="card-text text-muted">Mitglieder: {{ aCount }}</p>
+                    <div class="mt-auto">
+                        <a class="btn btn-danger w-100 {% if lockedTo is not null and lockedTo != 'A' %}disabled{% endif %}"
+                           href="{{ path('party_clash_select', { id: party.id, side: 'A' }) }}">
+                            Team {{ tn['A'] }} wählen
+                        </a>
+                        {% if lockedTo is not null and lockedTo != 'A' %}
+                            <small class="text-muted">Aufgrund einer zu großen Differenz ist nur die Wahl des kleineren Teams möglich.</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card h-100">
+                <img src="{{ asset('media/clash/teamB.png') }}" class="card-img-top" alt="Team {{ tn['B'] }}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Team {{ tn['B'] }}</h5>
+                    <p class="card-text text-muted">Mitglieder: {{ bCount }}</p>
+                    <div class="mt-auto">
+                        <a class="btn btn-primary w-100 {% if lockedTo is not null and lockedTo != 'B' %}disabled{% endif %}"
+                           href="{{ path('party_clash_select', { id: party.id, side: 'B' }) }}">
+                            Team {{ tn['B'] }} wählen
+                        </a>
+                        {% if lockedTo is not null and lockedTo != 'B' %}
+                            <small class="text-muted">Aufgrund einer zu großen Differenz ist nur die Wahl des kleineren Teams möglich.</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zur Party</a>
+    </div>
+</div>
+{% endblock %}

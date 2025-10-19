@@ -39,6 +39,12 @@ abstract class PartyMember
     #[ORM\Column(nullable: true)]
     private ?int $extraGuests = null;
 
+    #[ORM\Column(name: 'clash_team', type: 'string', length: 20, nullable: true)]
+    private ?string $clashTeam = null;
+
+    #[ORM\Column(name: 'clash_points', type: 'integer', options: ['default' => 0])]
+    private int $clashPoints = 0;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -91,6 +97,28 @@ abstract class PartyMember
     {
         $this->extraGuests = $extraGuests;
 
+        return $this;
+    }
+
+    public function getClashTeam(): ?string
+    {
+        return $this->clashTeam;
+    }
+
+    public function setClashTeam(?string $clashTeam): static
+    {
+        $this->clashTeam = $clashTeam;
+        return $this;
+    }
+
+    public function getClashPoints(): int
+    {
+        return $this->clashPoints;
+    }
+
+    public function setClashPoints(int $clashPoints): static
+    {
+        $this->clashPoints = max(0, $clashPoints);
         return $this;
     }
 

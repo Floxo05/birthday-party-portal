@@ -44,6 +44,72 @@ class PartyMemberRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function countByPartyAndTeam(Party $party, string $team): int
+    {
+        return (int)$this->createQueryBuilder('pm')
+            ->select('COUNT(pm.id)')
+            ->where('pm.party = :party')
+            ->andWhere('pm.clashTeam = :team')
+            ->setParameter('party', $party->getId(), UuidType::NAME)
+            ->setParameter('team', $team)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getTeamCounts(Party $party): array
+    {
+        $qb = $this->createQueryBuilder('pm')
+            ->select('pm.clashTeam AS team, COUNT(pm.id) AS cnt')
+            ->where('pm.party = :party')
+            ->andWhere('pm.clashTeam IS NOT NULL')
+            ->groupBy('pm.clashTeam')
+            ->setParameter('party', $party->getId(), UuidType::NAME);
+        $rows = $qb->getQuery()->getArrayResult();
+        $result = ['A' => 0, 'B' => 0];
+        foreach ($rows as $row) {
+            $t = $row['team'];
+            if (isset($result[$t])) {
+                $result[$t] = (int)$row['cnt'];
+            }
+        }
+        return $result;
+    }
+
+    public function getTeamPoints(Party $party): array
+    {
+        $qb = $this->createQueryBuilder('pm')
+            ->select('pm.clashTeam AS team, SUM(pm.clashPoints) AS pts')
+            ->where('pm.party = :party')
+            ->andWhere('pm.clashTeam IS NOT NULL')
+            ->groupBy('pm.clashTeam')
+            ->setParameter('party', $party->getId(), UuidType::NAME);
+        $rows = $qb->getQuery()->getArrayResult();
+        $result = ['A' => 0, 'B' => 0];
+        foreach ($rows as $row)
+        {
+            $t = $row['team'];
+            if (isset($result[$t]))
+            {
+                $result[$t] = (int)($row['pts'] ?? 0);
+            }
+        }
+        return $result;
+    }
+
+    public function findMembersByPartyAndTeam(Party $party, string $team): array
+    {
+        return $this->createQueryBuilder('pm')
+            ->leftJoin('pm.user', 'u')
+            ->addSelect('u')
+            ->where('pm.party = :party')
+            ->andWhere('pm.clashTeam = :team')
+            ->setParameter('party', $party->getId(), UuidType::NAME)
+            ->setParameter('team', $team)
+            ->orderBy('u.username', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Find all party memberships for a user, ordered by party date ascending.
      *

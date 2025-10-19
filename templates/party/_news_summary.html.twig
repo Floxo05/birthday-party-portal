@@ -8,7 +8,7 @@
                   {% if isUnread %}list-group-item-warning{% endif %}">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="d-flex flex-column">
-                    <h5 class="mb-1">{{ item.text|nl2br|u.truncate(30, '...') }}</h5>
+                    <h5 class="mb-1">{{ item.text|striptags|u.truncate(30, '...') }}</h5>
                     <small class="text-muted mt-2">{{ item.createdAt|date('d.m.Y H:i') }}</small>
                 </div>
 

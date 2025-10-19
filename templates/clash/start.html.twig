@@ -1,0 +1,193 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – Start{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    {% set myTeam = team %}
+    {% set oppTeam = team == 'A' ? 'B' : 'A' %}
+    {% set tn = teamNames ?? {'A':'A','B':'B'} %}
+    {% set colorA = 'danger' %} {# A=rot #}
+    {% set colorB = 'primary' %} {# B=blau #}
+    {% set colorMy = myTeam == 'A' ? colorA : colorB %}
+    {% set colorOpp = myTeam == 'A' ? colorB : colorA %}
+    {% set imgA = asset('media/clash/teamA.png') %}
+    {% set imgB = asset('media/clash/teamB.png') %}
+    {% set aPts = teamPoints['A'] ?? 0 %}
+    {% set bPts = teamPoints['B'] ?? 0 %}
+    {% set totalPts = (aPts + bPts) %}
+    {% set aPct = totalPts > 0 ? ((aPts / totalPts) * 100) : 50 %}
+    {% set bPct = 100 - aPct %}
+
+    <style>
+        /* Subtle glow for my team */
+        .clash-highlight-primary { box-shadow: 0 0 0.75rem rgba(0,0,0,.08), 0 0 1rem var(--bs-primary); border-width: 2px !important; transform: translateY(-2px); }
+        .clash-highlight-danger  { box-shadow: 0 0 0.75rem rgba(0,0,0,.08), 0 0 1rem var(--bs-danger);  border-width: 2px !important; transform: translateY(-2px); }
+        .vs-badge { font-weight: 800; letter-spacing: .08em; }
+        .member-list { max-height: 220px; overflow: auto; }
+
+        .clash-score-wrap {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .clash-bar {
+            flex: 1 1 auto;
+            display: flex;
+            height: 22px;
+            border-radius: 11px;
+            overflow: hidden;
+            background: #e9ecef;
+            position: relative;
+            border: 2px solid rgba(0, 0, 0, .08);
+            box-shadow: inset 0 0.2rem 0.5rem rgba(0, 0, 0, .12), 0 0.35rem 0.9rem rgba(0, 0, 0, .08);
+        }
+
+        .clash-bar .seg-a {
+            background: var(--bs-danger);
+        }
+
+        .clash-bar .seg-b {
+            background: var(--bs-primary);
+        }
+
+        .clash-team-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(0, 0, 0, .15);
+        }
+
+        .clash-scores {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Cooler Clash title */
+        .clash-title {
+            font-weight: 900;
+            letter-spacing: .02em;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0.15rem 0.15rem rgba(0, 0, 0, .08));
+        }
+
+        .clash-title-accent {
+            height: 4px;
+            width: 140px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--bs-danger), var(--bs-primary));
+            opacity: .85;
+        }
+    </style>
+
+    <div class="d-flex align-items-baseline gap-2 mb-1">
+        <h1 class="clash-title mb-0">Clash</h1>
+    </div>
+    <div class="text-muted small">Team {{ tn['A'] }} vs Team {{ tn['B'] }}</div>
+    <div class="clash-title-accent mb-2"></div>
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <p class="lead mb-2">
+        Du bist <span class="badge bg-{{ colorMy }}">Team {{ tn[myTeam] }}</span>
+        und trittst an gegen <span class="badge bg-{{ colorOpp }}">Team {{ tn[oppTeam] }}</span>.
+    </p>
+
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <span class="small text-muted fw-semibold text-uppercase">Teamwertung</span>
+        <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button" data-bs-toggle="collapse"
+                data-bs-target="#clashInfo" aria-expanded="false" aria-controls="clashInfo">
+            <i class="fa fa-info-circle me-1"></i>Info
+        </button>
+    </div>
+    <div id="clashInfo" class="collapse small text-muted mb-2">
+        Spiele für den Clash werden demnächst freigeschaltet.
+    </div>
+
+    <div class="clash-score-wrap mb-3">
+        <img class="clash-team-icon" src="{{ imgA }}" alt="Team {{ tn['A'] }}">
+        <div class="clash-bar" aria-label="Punkteverteilung"
+             title="Team {{ tn['A'] }}: {{ aPts }}, Team {{ tn['B'] }}: {{ bPts }}">
+            <div class="seg-a" style="width: {{ aPct }}%"></div>
+            <div class="seg-b" style="width: {{ bPct }}%"></div>
+        </div>
+        <img class="clash-team-icon" src="{{ imgB }}" alt="Team {{ tn['B'] }}">
+    </div>
+    <div class="d-flex justify-content-between clash-scores mb-3">
+        <span class="text-danger">{{ aPts }}</span>
+        <span class="text-primary">{{ bPts }}</span>
+    </div>
+
+    <div class="row g-3 align-items-stretch mt-2">
+        {# Order dynamically: my team card first #}
+        <div class="col-12 col-md-5 order-1 order-md-1">
+            {% if myTeam == 'A' %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'A',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersA,
+                    isMyTeam: true,
+                    color: colorA,
+                    img: imgA,
+                    collapseId: 'teamAList'
+                } only %}
+            {% else %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'B',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersB,
+                    isMyTeam: true,
+                    color: colorB,
+                    img: imgB,
+                    collapseId: 'teamBList'
+                } only %}
+            {% endif %}
+        </div>
+
+        <div class="col-12 col-md-2 order-2 order-md-2 d-flex align-items-center justify-content-center">
+            <span class="vs-badge badge bg-dark text-uppercase px-3 py-2">VS</span>
+        </div>
+
+        <div class="col-12 col-md-5 order-3 order-md-3">
+            {% if myTeam == 'A' %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'B',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersB,
+                    isMyTeam: false,
+                    color: colorB,
+                    img: imgB,
+                    collapseId: 'teamBList'
+                } only %}
+            {% else %}
+                {% include 'clash/_team_card.html.twig' with {
+                    side: 'A',
+                    tn: tn,
+                    counts: counts,
+                    members: teamMembersA,
+                    isMyTeam: false,
+                    color: colorA,
+                    img: imgA,
+                    collapseId: 'teamAList'
+                } only %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="mt-4 d-grid gap-2 d-md-block">
+        <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zur Party</a>
+    </div>
+</div>
+{% endblock %}

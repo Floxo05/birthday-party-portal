@@ -39,6 +39,14 @@ WORKDIR /var/www/html
 # Symfony-App kopieren
 COPY . .
 
+# Vor composer install:
+ENV APP_ENV=prod \
+    APP_DEBUG=0 \
+    COMPOSER_MEMORY_LIMIT=-1
+
+# PHP CLI Memory erhöhen (wirken für CLI & FPM):
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
+
 # Composer install (prod only)
 RUN composer install --optimize-autoloader --no-interaction --ignore-platform-req=ext-http
 
