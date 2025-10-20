@@ -18,9 +18,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Override;
@@ -103,9 +103,10 @@ class PartyCrudController extends AbstractCrudController
                 foreach ($members as $partyMember)
                 {
                     $formattedMembers[] = sprintf(
-                        '%s - %s',
+                        '%s - %s - %s',
                         $partyMember->getUser(),
-                        $this->partyMemberRoleTranslator->translate($partyMember->getRole())
+                        $this->partyMemberRoleTranslator->translate($partyMember->getRole()),
+                        $partyMember->getResponseStatus()->value
                     );
                 }
 
