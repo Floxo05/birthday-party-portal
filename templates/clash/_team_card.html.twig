@@ -25,7 +25,9 @@
                 <div class="collapse mt-2" id="{{ collapseId }}">
                     <ul class="list-group list-group-flush member-list">
                         {% for m in members %}
-                            <li class="list-group-item py-2"><i class="fa fa-user text-{{ color }} me-2"></i>{{ m.user.name ?? m.user.username }}</li>
+                            <li class="list-group-item py-2"><i
+                                        class="fa fa-user text-{{ color }} me-2"></i>{{ m.user.username ?? m.user.name }}
+                            </li>
                         {% else %}
                             <li class="list-group-item text-muted">Noch keine Mitglieder</li>
                         {% endfor %}
