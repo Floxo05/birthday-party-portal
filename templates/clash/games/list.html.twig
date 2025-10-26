@@ -74,6 +74,26 @@
                                 </div>
                                 <h5 class="card-title">{{ g.title }}</h5>
                                 <p class="card-text text-muted flex-grow-1">{{ g.description }}</p>
+                                <div class="small text-muted mt-1">
+                                    {% if g.startAt is defined and g.endAt is defined and g.endAt %}
+                                        {# Active list shows only active games; show until with remaining time #}
+                                        Verfügbar bis {{ g.endAt|date('d.m.Y H:i') }}
+                                        {% set secs = g.endAt|date('U') - "now"|date('U') %}
+                                        {% if secs > 0 %}
+                                            {# simple remaining time formatting #}
+                                            {% set days = (secs // 86400)|round(0, 'floor') %}
+                                            {% set hrs = ((secs % 86400) // 3600)|round(0, 'floor') %}
+                                            {% set mins = ((secs % 3600) // 60)|round(0, 'floor') %}
+                                            <span class="ms-1">(noch
+                                                {% if days > 0 %}{{ days }} T{% endif %}
+                                                {% if hrs > 0 %}{{ days > 0 ? ' ' : '' }}{{ hrs }} Std{% endif %}
+                                                {% if mins > 0 and days == 0 %}{{ (hrs > 0 ? ' ' : '') ~ mins }} Min{% endif %}
+                                                )</span>
+                                        {% endif %}
+                                    {% elseif g.startAt is defined and g.startAt %}
+                                        Verfügbar ab {{ g.startAt|date('d.m.Y H:i') }}
+                                    {% endif %}
+                                </div>
                                 <div class="d-grid gap-2 mt-2">
                                     <a href="{{ path('party_clash_game_detail', { id: party.id, slug: g.slug }) }}"
                                        class="btn btn-primary">Zur Spielseite</a>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Flappy Duck – Birthday Portal</title>
+    <title>Flappy Floxo – Birthday Portal</title>
     <style>
         :root {
             --bg: #0b0f17;
@@ -175,7 +175,7 @@
 <body>
 <div class="shell" id="app">
     <header class="row">
-        <h1>Flappy Duck</h1>
+        <h1>Flappy Floxo</h1>
         <div class="grow"></div>
         <span id="ctx" class="badge">—</span>
     </header>
@@ -187,7 +187,7 @@
                 <div class="pill" id="diff">Schwierigkeit: 1.0×</div>
             </div>
             <div class="overlay">
-                <canvas id="game" width="480" height="720" aria-label="Flappy Duck Spielfeld"></canvas>
+                <canvas id="game" width="480" height="720" aria-label="Flappy Floxo Spielfeld"></canvas>
                 <div id="startLayer" class="layer">
                     <div class="panel">
                         <h2>Tippen/Klicken oder Leertaste zum Start</h2>
@@ -318,7 +318,7 @@
     function difficultyMultiplier() {
         const timeMin = Math.min(state.t / 60000, 3);
         const scoreFactor = Math.min(state.score / 20, 2);
-        return 1 + timeMin * 0.5 + scoreFactor * 0.5;
+        return 1 + timeMin * 0.2 + scoreFactor * 0.4;
     }
 
     function spawnPipe() {
@@ -589,12 +589,6 @@
             ctx2d.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
             ctx2d.fillRect(bx, by, state.bird.size, state.bird.size);
         }
-        const hbs = state.bird.size * 0.9, hbx = state.bird.x - hbs / 2, hby = state.bird.y - hbs / 2;
-        ctx2d.save();
-        ctx2d.strokeStyle = '#ff3b3b';
-        ctx2d.lineWidth = 2;
-        ctx2d.strokeRect(Math.round(hbx), Math.round(hby), Math.round(hbs), Math.round(hbs));
-        ctx2d.restore();
         drawParticles();
         drawPopups();
         drawScoreOverlay();

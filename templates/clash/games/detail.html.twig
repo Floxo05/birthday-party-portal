@@ -14,14 +14,73 @@
         {% set colorByTeam = {'A':'danger','B':'primary'} %}
 
         {% if active %}
-            <div class="alert alert-success py-2">Dieses Spiel ist <strong>aktiv</strong>. Deine Ergebnisse werden
+            <div class="alert alert-success py-2 mb-2">Dieses Spiel ist <strong>aktiv</strong>. Deine Ergebnisse werden
                 gewertet.
             </div>
         {% else %}
-            <div class="alert alert-secondary py-2">Dieses Spiel ist derzeit <strong>nicht aktiv</strong> oder bereits
+            <div class="alert alert-secondary py-2 mb-2">Dieses Spiel ist derzeit <strong>nicht aktiv</strong> oder
+                bereits
                 beendet.
             </div>
         {% endif %}
+
+        <div class="small text-muted mb-3">
+            {% if game.startAt is defined and game.startAt and game.endAt is defined and game.endAt %}
+                Verfügbar von {{ game.startAt|date('d.m.Y H:i') }} bis {{ game.endAt|date('d.m.Y H:i') }}
+                {% set nowTs = "now"|date('U') %}
+                {% set secs = game.endAt|date('U') - nowTs %}
+                {% if active and secs > 0 %}
+                    {% set days = (secs // 86400)|round(0, 'floor') %}
+                    {% set hrs = ((secs % 86400) // 3600)|round(0, 'floor') %}
+                    {% set mins = ((secs % 3600) // 60)|round(0, 'floor') %}
+                    <span class="ms-1">(noch
+                        {% if days > 0 %}{{ days }} T{% endif %}
+                        {% if hrs > 0 %}{{ days > 0 ? ' ' : '' }}{{ hrs }} Std{% endif %}
+                        {% if mins > 0 and days == 0 %}{{ (hrs > 0 ? ' ' : '') ~ mins }} Min{% endif %}
+                        )</span>
+                {% elseif not active and game.startAt > ("now"|date_modify('now')) %}
+                    {# upcoming: show starts in #}
+                    {% set secs2 = game.startAt|date('U') - nowTs %}
+                    {% if secs2 > 0 %}
+                        {% set d2 = (secs2 // 86400)|round(0, 'floor') %}
+                        {% set h2 = ((secs2 % 86400) // 3600)|round(0, 'floor') %}
+                        {% set m2 = ((secs2 % 3600) // 60)|round(0, 'floor') %}
+                        <span class="ms-1">(beginnt in
+                            {% if d2 > 0 %}{{ d2 }} T{% endif %}
+                            {% if h2 > 0 %}{{ d2 > 0 ? ' ' : '' }}{{ h2 }} Std{% endif %}
+                            {% if m2 > 0 and d2 == 0 %}{{ (h2 > 0 ? ' ' : '') ~ m2 }} Min{% endif %}
+                            )</span>
+                    {% endif %}
+                {% endif %}
+            {% elseif game.startAt is defined and game.startAt %}
+                Verfügbar ab {{ game.startAt|date('d.m.Y H:i') }}
+            {% elseif game.endAt is defined and game.endAt %}
+                Verfügbar bis {{ game.endAt|date('d.m.Y H:i') }}
+            {% endif %}
+        </div>
+
+        <div class="mb-3">
+            <h5>Bestenliste</h5>
+            {% if leaderboard is empty %}
+                <div class="text-muted">Noch keine Ergebnisse.</div>
+            {% else %}
+                <ol class="list-group list-group-numbered">
+                    {% for row in leaderboard %}
+                        {% set member = row.member %}
+                        {% set score = row.score %}
+                        {% set t = member.clashTeam ?? 'A' %}
+                        {% set c = colorByTeam[t] %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                <span class="badge bg-{{ c }} me-2">Team {{ tn[t] ?? t }}</span>
+                {{ member.user.name ?? member.user.username }}
+              </span>
+                            <span class="fw-bold">{{ score }}</span>
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endif %}
+        </div>
 
         <div class="row g-3 align-items-start">
             <div class="col-12 col-lg-7">
@@ -31,35 +90,12 @@
                 {% endif %}
                 <div class="d-grid gap-2">
                     {% if active %}
-                        <a class="btn btn-primary" id="startGameBtn" href="{{ playUrl }}" target="_blank"
-                           rel="noopener">Spiel starten (neuer Tab)</a>
+                        <a class="btn btn-primary" id="startGameBtn" href="{{ playUrl }}">Spiel starten</a>
                         <small class="text-muted d-block mt-2">Tippe auf den Button, um das Spiel zu starten.</small>
                     {% else %}
                         <button class="btn btn-secondary" type="button" disabled>Nicht aktiv</button>
                     {% endif %}
                 </div>
-            </div>
-            <div class="col-12 col-lg-5">
-                <h5>Bestenliste</h5>
-                {% if leaderboard is empty %}
-                    <div class="text-muted">Noch keine Ergebnisse.</div>
-                {% else %}
-                    <ol class="list-group list-group-numbered">
-                        {% for row in leaderboard %}
-                            {% set member = row.member %}
-                            {% set score = row.score %}
-                            {% set t = member.clashTeam ?? 'A' %}
-                            {% set c = colorByTeam[t] %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>
-                <span class="badge bg-{{ c }} me-2">Team {{ tn[t] ?? t }}</span>
-                {{ member.user.name ?? member.user.username }}
-              </span>
-                                <span class="fw-bold">{{ score }}</span>
-                            </li>
-                        {% endfor %}
-                    </ol>
-                {% endif %}
             </div>
         </div>
 
