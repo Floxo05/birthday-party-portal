@@ -318,7 +318,7 @@
     function difficultyMultiplier() {
         const timeMin = Math.min(state.t / 60000, 3);
         const scoreFactor = Math.min(state.score / 20, 2);
-        return 1 + timeMin * 0.2 + scoreFactor * 0.4;
+        return 1 + timeMin * 0.1 + scoreFactor * 0.2;
     }
 
     function spawnPipe() {
