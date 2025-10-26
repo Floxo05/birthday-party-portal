@@ -248,8 +248,9 @@
     }
 
     const CTX = getCtx();
+    const isFileOrigin = (location.origin === 'null' || location.protocol === 'file:');
     const CFG = {
-        callbackUrl: CTX.callbackUrl || `${location.origin}/api/game-results`,
+        callbackUrl: CTX.callbackUrl || (isFileOrigin ? null : `${location.origin}/api/game-results`),
         token: CTX.token || null,
         language: CTX.lang,
         maxDurationMs: window.GAME_CONFIG.maxDurationMs ?? DEFAULTS.maxDurationMs,
@@ -564,8 +565,14 @@
             if (!c.collected) drawCoin(c);
         }
         const bx = Math.round(state.bird.x - state.bird.size / 2), by = Math.round(state.bird.y - state.bird.size / 2);
-        const img = (performance.now() < showDownUntil && tibDown.complete) ? tibDown : tibUp;
-        if (img && img.complete) {
+        const now = performance.now();
+        const upOk = tibUp && tibUp.complete && tibUp.naturalWidth > 0 && tibUp.naturalHeight > 0;
+        const downOk = tibDown && tibDown.complete && tibDown.naturalWidth > 0 && tibDown.naturalHeight > 0;
+        let img = null;
+        if (now < showDownUntil && downOk) img = tibDown;
+        else if (upOk) img = tibUp;
+        else if (downOk) img = tibDown;
+        if (img) {
             ctx2d.drawImage(img, bx, by, state.bird.size, state.bird.size);
         } else {
             ctx2d.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
@@ -720,6 +727,10 @@
         errBox.classList.add('hidden');
         errBox.textContent = '';
         layer.classList.remove('hidden');
+        if (isFileOrigin && !CFG.callbackUrl) {
+            submitState.textContent = 'Lokaler Testmodus – kein Submit';
+            return;
+        }
         let ok = false, lastErr = null;
         const {attempts, baseMs} = CFG.backoff;
         let i = 0;
