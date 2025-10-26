@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – Spiele{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <h1 class="mb-3">Clash – Spiele</h1>
+        <p class="text-muted">Wähle ein Spiel. Innerhalb des freigeschalteten Zeitraums kannst du Punkte sammeln. Die
+            Bestenliste zählt für euren Clash!</p>
+
+        {# Scoreboard with total earned team points across games #}
+        {% if scoreboard is defined and scoreboard is not empty %}
+            <div class="mb-4">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-md-between mb-2">
+                    <h2 class="h4 mb-0 me-md-3">Scoreboard – gesammelte Teampunkte</h2>
+                    <span class="text-muted small mt-1 mt-md-0">Summe aus allen gestarteten Spielen</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 table-hover">
+                        <thead>
+                        <tr>
+                            <th style="width:60px;">#</th>
+                            <th>Spieler</th>
+                            <th style="width:120px;">Team</th>
+                            <th style="width:120px;" class="text-end">Punkte</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% set rank = 0 %}
+                        {% set lastPts = null %}
+                        {% set actual = 0 %}
+                        {% for row in scoreboard %}
+                            {% set actual = actual + 1 %}
+                            {% set pts = row.points %}
+                            {% if lastPts is null or pts != lastPts %}
+                                {% set rank = actual %}
+                                {% set lastPts = pts %}
+                            {% endif %}
+                            {% set m = row.member %}
+                            {% set uname = m.user ? m.user.username : 'Unbekannt' %}
+                            {% set tm = m.clashTeam %}
+                            <tr>
+                                <td class="text-muted">{{ rank }}</td>
+                                <td>{{ uname }}</td>
+                                <td>
+                                    {% if tm == 'A' %}
+                                        <span class="badge bg-danger">Team A</span>
+                                    {% elseif tm == 'B' %}
+                                        <span class="badge bg-primary">Team B</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">—</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-semibold">{{ pts }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if games is empty %}
+            <div class="alert alert-secondary">Aktuell ist kein Spiel freigeschaltet. Schau später wieder vorbei!</div>
+        {% else %}
+            <div class="row g-3">
+                {% for g in games %}
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="d-flex align-items-start justify-content-between mb-2">
+                                    <div class="fs-3" aria-hidden="true">{{ g.icon ?? '🎮' }}</div>
+                                    <span class="badge bg-success text-uppercase">Aktiv</span>
+                                </div>
+                                <h5 class="card-title">{{ g.title }}</h5>
+                                <p class="card-text text-muted flex-grow-1">{{ g.description }}</p>
+                                <div class="d-grid gap-2 mt-2">
+                                    <a href="{{ path('party_clash_game_detail', { id: party.id, slug: g.slug }) }}"
+                                       class="btn btn-primary">Zur Spielseite</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="mt-4 d-grid gap-2 d-md-block">
+            <a href="{{ path('party_clash_start', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zum
+                Clash</a>
+            <a href="{{ path('party_show', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zur Party</a>
+        </div>
+    </div>
+{% endblock %}

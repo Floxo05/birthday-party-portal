@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – {{ game.title }}{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <h1 class="mb-0">{{ game.title }}</h1>
+            <span class="fs-3" aria-hidden="true">{{ game.icon ?? '🎮' }}</span>
+        </div>
+        <p class="text-muted">{{ game.description }}</p>
+
+        {% set tn = {'A':'Flo','B':'Malte'} %}
+        {% set colorByTeam = {'A':'danger','B':'primary'} %}
+
+        {% if active %}
+            <div class="alert alert-success py-2">Dieses Spiel ist <strong>aktiv</strong>. Deine Ergebnisse werden
+                gewertet.
+            </div>
+        {% else %}
+            <div class="alert alert-secondary py-2">Dieses Spiel ist derzeit <strong>nicht aktiv</strong> oder bereits
+                beendet.
+            </div>
+        {% endif %}
+
+        <div class="row g-3 align-items-start">
+            <div class="col-12 col-lg-7">
+                {% if game.image is defined and game.image %}
+                    <img src="{{ asset(game.image) }}" alt="{{ game.title }}" class="img-fluid rounded border mb-2"
+                         style="max-height: 320px; object-fit: cover; width: 100%;"/>
+                {% endif %}
+                <div class="d-grid gap-2">
+                    {% if active %}
+                        <a class="btn btn-primary" id="startGameBtn" href="{{ playUrl }}" target="_blank"
+                           rel="noopener">Spiel starten (neuer Tab)</a>
+                        <small class="text-muted d-block mt-2">Falls der automatische Start blockiert wird, klicke auf
+                            den Button oben.</small>
+                        <script>
+                            window.addEventListener('DOMContentLoaded', function () {
+                                try {
+                                    const w = window.open('{{ playUrl|e('js') }}', '_blank');
+                                    if (!w || w.closed) { /* popup blocked */
+                                    }
+                                } catch (e) {
+                                }
+                            });
+                        </script>
+                    {% else %}
+                        <button class="btn btn-secondary" type="button" disabled>Nicht aktiv</button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-12 col-lg-5">
+                <h5>Bestenliste</h5>
+                {% if leaderboard is empty %}
+                    <div class="text-muted">Noch keine Ergebnisse.</div>
+                {% else %}
+                    <ol class="list-group list-group-numbered">
+                        {% for row in leaderboard %}
+                            {% set member = row.member %}
+                            {% set score = row.score %}
+                            {% set t = member.clashTeam ?? 'A' %}
+                            {% set c = colorByTeam[t] %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>
+                <span class="badge bg-{{ c }} me-2">Team {{ tn[t] ?? t }}</span>
+                {{ member.user.name ?? member.user.username }}
+              </span>
+                                <span class="fw-bold">{{ score }}</span>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-4 d-grid gap-2 d-md-block">
+            <a href="{{ path('party_clash_games', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zu den
+                Spielen</a>
+            <a href="{{ path('party_clash_start', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zum
+                Clash</a>
+        </div>
+    </div>
+{% endblock %}

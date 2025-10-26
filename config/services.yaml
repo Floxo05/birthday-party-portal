@@ -4,6 +4,17 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+  clash_rank_points:
+    1: 15
+    2: 12
+    3: 10
+    4: 8
+    5: 6
+    6: 5
+    7: 4
+    8: 3
+    9: 2
+    10: 1
 
 services:
   # default configuration for services in *this* file
@@ -22,6 +33,11 @@ services:
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
+
+  App\Service\GameRegistry:
+    arguments:
+      $games: '%clash_games%'
+      $rankPoints: '%clash_rank_points%'
 
   Aws\S3\S3Client:
     arguments:

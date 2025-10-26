@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Flappy Duck – Birthday Portal</title>
+    <style>
+        :root {
+            --bg: #0b0f17;
+            --fg: #e6ecf2;
+            --accent: #ef4444;
+            --pipe: #22c55e;
+            --muted: #94a3b8;
+        }
+
+        html, body {
+            margin: 0;
+            height: 100%;
+            background: var(--bg);
+            color: var(--fg);
+            font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif
+        }
+
+        .shell {
+            display: grid;
+            grid-template-rows:auto 1fr auto;
+            min-height: 100%
+        }
+
+        header, footer {
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, .03);
+            border-bottom: 1px solid rgba(255, 255, 255, .06)
+        }
+
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            border-bottom: 0
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(18px, 3.5vw, 24px)
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap
+        }
+
+        .grow {
+            flex: 1
+        }
+
+        main {
+            display: grid;
+            place-items: center;
+            padding: 8px
+        }
+
+        .card {
+            width: 100%;
+            max-width: 640px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+            padding: 10px;
+        }
+
+        .hud {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: linear-gradient(#0c1522, #0b0f17);
+            width: 100%;
+            height: auto;
+            max-width: 520px;
+            border-radius: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .35)
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .12);
+            font-size: 12px
+        }
+
+        .pill {
+            padding: 2px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .12)
+        }
+
+        .overlay {
+            position: relative
+        }
+
+        .layer {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 0, 0, .45);
+            backdrop-filter: blur(2px);
+        }
+
+        .layer.hidden {
+            display: none
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 16px;
+            padding: 16px 18px;
+            text-align: center
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #2563eb;
+            color: #fff
+        }
+
+        button.secondary {
+            background: transparent;
+            color: var(--fg);
+            border: 1px solid rgba(255, 255, 255, .18)
+        }
+
+        .kv {
+            display: grid;
+            grid-template-columns:1fr auto;
+            gap: 8px 12px;
+            text-align: left;
+            margin-top: 8px
+        }
+
+        .kv > div {
+            padding: 4px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, .12)
+        }
+
+        .kv > div:nth-child(odd) {
+            color: var(--muted)
+        }
+
+        .err {
+            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 0, 0, .35);
+            background: rgba(255, 0, 0, .1)
+        }
+    </style>
+</head>
+<body>
+<div class="shell" id="app">
+    <header class="row">
+        <h1>Flappy Duck</h1>
+        <div class="grow"></div>
+        <span id="ctx" class="badge">—</span>
+    </header>
+    <main>
+        <section class="card">
+            <div class="hud">
+                <div><strong>Score:</strong> <span id="score">0</span> &nbsp;•&nbsp; <strong>Highscore:</strong> <span
+                        id="best">0</span></div>
+                <div class="pill" id="diff">Schwierigkeit: 1.0×</div>
+            </div>
+            <div class="overlay">
+                <canvas id="game" width="480" height="720" aria-label="Flappy Duck Spielfeld"></canvas>
+                <div id="startLayer" class="layer">
+                    <div class="panel">
+                        <h2>Tippen/Klicken oder Leertaste zum Start</h2>
+                        <p>Steuerung: Tippen/Klicken/Leertaste = Flügelschlag nach oben. Weiche den grünen Röhren
+                            aus.</p>
+                        <button id="startBtn">Start</button>
+                    </div>
+                </div>
+                <div id="gameOverLayer" class="layer hidden">
+                    <div class="panel">
+                        <h2>Game Over</h2>
+                        <div class="kv" id="summary"></div>
+                        <div id="submitState" class="muted">Sende Ergebnis…</div>
+                        <div class="err hidden" id="errBox"></div>
+                        <p>
+                            <button id="againBtn">Nochmal</button>
+                            <button id="scoreboardBtn" class="secondary" hidden>Scoreboard</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="row">
+        <div class="muted">© Birthday‑Portal Mini‑Game</div>
+        <div class="grow"></div>
+        <div class="muted">Click/Tap/Space • Local Highscore • API Submit</div>
+    </footer>
+</div>
+
+<script>
+    // ===== Flappy Tibbers – Hell Arcade Edition (clean build) =====
+    // Context & Config
+    const DEFAULTS = {
+        callbackUrl: null,
+        token: null,
+        language: 'de',
+        maxDurationMs: 5 * 60_000,
+        requireVisibility: true,
+        backoff: {attempts: 4, baseMs: 500}
+    };
+    window.GAME_CONFIG = window.GAME_CONFIG || {};
+
+    function getCtx() {
+        const u = new URL(location.href);
+        const qp = Object.fromEntries(u.searchParams.entries());
+        const match = u.pathname.match(/\/public\/game\/([^/?#]+)/);
+        const gameIdFromPath = match ? decodeURIComponent(match[1]) : null;
+        return {
+            partyId: qp.partyId || null,
+            playerId: qp.playerId || null,
+            gameId: qp.gameId || gameIdFromPath || 'flappy-duck',
+            sessionId: qp.sessionId || (crypto.randomUUID?.() ?? String(Date.now())),
+            callbackUrl: qp.callbackUrl || window.GAME_CONFIG.callbackUrl || null,
+            token: qp.token || window.GAME_CONFIG.token || null,
+            lang: qp.lang || window.GAME_CONFIG.language || DEFAULTS.language
+        };
+    }
+
+    const CTX = getCtx();
+    const CFG = {
+        callbackUrl: CTX.callbackUrl || `${location.origin}/api/game-results`,
+        token: CTX.token || null,
+        language: CTX.lang,
+        maxDurationMs: window.GAME_CONFIG.maxDurationMs ?? DEFAULTS.maxDurationMs,
+        requireVisibility: window.GAME_CONFIG.requireVisibility ?? DEFAULTS.requireVisibility,
+        backoff: window.GAME_CONFIG.backoff || DEFAULTS.backoff
+    };
+
+    document.getElementById('ctx').textContent = [`party:${CTX.partyId?.slice(0, 8) || '—'}`, `player:${CTX.playerId?.slice(0, 8) || '—'}`, `game:${CTX.gameId}`].join(' • ');
+
+    // Canvas
+    const canvas = document.getElementById('game');
+    const ctx2d = canvas.getContext('2d');
+    let W = canvas.width, H = canvas.height;
+
+    // Responsive portrait + DPR
+    function resizeCanvas() {
+        const vw = Math.max(320, Math.min(window.innerWidth, 520));
+        const vh = window.innerHeight;
+        const targetH = Math.min(Math.floor(vh * 0.8), Math.floor(vw * 16 / 9));
+        const targetW = Math.floor(targetH * 9 / 16);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.style.width = targetW + 'px';
+        canvas.style.height = targetH + 'px';
+        canvas.width = Math.round(targetW * dpr);
+        canvas.height = Math.round(targetH * dpr);
+        ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
+        W = targetW;
+        H = targetH;
+        state.bird.size = Math.round(H * 0.06); // half of previous 0.12
+    }
+
+    window.addEventListener('resize', resizeCanvas, {passive: true});
+
+    // Sprites
+    const tibUp = new Image();
+    const tibDown = new Image();
+    tibUp.src = 'Tibbers mit Flügel oben.png';
+    tibDown.src = 'Tibbers mit Flügel unten.png';
+    let showDownUntil = 0;
+
+    // Game state
+    const state = {
+        startedAt: null, endedAt: null, over: false, paused: false, t: 0,
+        score: 0, best: Number(localStorage.getItem('flappy_highscore') || 0),
+        passedIds: new Set(),
+        bird: {x: W * 0.25, y: H * 0.5, size: 56, vy: 0},
+        gravity: 0.0019, flapVy: -0.6,
+        pipes: [], coins: [], particles: [], popups: [], coinPipeCountdown: 4,
+        pipeGapBase: 180, pipeSpeedBase: 0.18, pipeEveryMs: 1400, lastPipeAt: 0
+    };
+    const diffEl = document.getElementById('diff');
+
+    // Difficulty & spawns
+    function difficultyMultiplier() {
+        const timeMin = Math.min(state.t / 60000, 3);
+        const scoreFactor = Math.min(state.score / 20, 2);
+        return 1 + timeMin * 0.5 + scoreFactor * 0.5;
+    }
+
+    function spawnPipe() {
+        const mult = difficultyMultiplier();
+        const gap = Math.max(90, state.pipeGapBase / mult);
+        const top = Math.floor(Math.random() * (H - gap - 120)) + 40;
+        const id = crypto.randomUUID?.() ?? String(Math.random());
+        const w = Math.round(60 + Math.random() * 26);
+        const skin = Math.random() < 0.5 ? 'obsidian' : 'bone';
+        state.pipes.push({id, x: W + 40, gapTop: top, gapBottom: top + gap, w, skin});
+        // coin – nur alle 4–6 Röhren
+        state.coinPipeCountdown--;
+        if (state.coinPipeCountdown <= 0) {
+            const coinY = top + gap / 2 + (Math.random() * 0.5 - 0.25) * gap;
+            const coinR = Math.max(8, Math.min(14, Math.round(gap * 0.12)));
+            state.coins.push({x: W + 40 + w * 0.5, y: coinY, r: coinR, collected: false});
+            state.coinPipeCountdown = 4 + Math.floor(Math.random() * 3); // 4..6
+        }
+    }
+
+    // Particles & coins helpers
+    function spawnFlapParticles(x, y) {
+        for (let i = 0; i < 6; i++) {
+            state.particles.push({x, y, vx: (Math.random() * 2 - 1) * 0.25, vy: (Math.random() * -0.6) - 0.2, a: 1});
+        }
+    }
+
+    function updateParticles(dt) {
+        const k = dt / 16;
+        for (const p of state.particles) {
+            p.x += p.vx * W * 0.002 * k;
+            p.y += p.vy * H * 0.002 * k;
+            p.vy += 0.001 * k;
+            p.a -= 0.02 * k;
+        }
+        state.particles = state.particles.filter(p => p.a > 0);
+    }
+
+    // Input
+    function flap() {
+        if (state.over) return;
+        state.bird.vy = state.flapVy;
+        showDownUntil = performance.now() + 140;
+        spawnFlapParticles(state.bird.x, state.bird.y);
+    }
+
+    // Update
+    function update(dt) {
+        if (state.paused || state.over) return;
+        state.t += dt;
+        const mult = difficultyMultiplier();
+        diffEl.textContent = `Schwierigkeit: ${mult.toFixed(1)}×`;
+        const g = state.gravity * (0.85 + 0.15 * mult);
+        const speed = state.pipeSpeedBase * (0.9 + 0.4 * mult);
+        state.bird.vy += g * dt;
+        state.bird.y += state.bird.vy * dt * (H / 720);
+        const ground = Math.round(H * 0.06);
+        const floorY = H - ground;
+        if (state.bird.y + state.bird.size / 2 >= floorY) {
+            state.bird.y = floorY - state.bird.size / 2;
+            gameOver();
+        }
+        if (state.bird.y - state.bird.size / 2 <= 0) {
+            state.bird.y = state.bird.size / 2;
+        }
+        if (state.t - state.lastPipeAt >= state.pipeEveryMs / Math.max(1, mult - 0.2)) {
+            spawnPipe();
+            state.lastPipeAt = state.t;
+        }
+        for (const p of state.pipes) {
+            p.x -= speed * dt * (W / 480);
+        }
+        while (state.pipes.length && state.pipes[0].x + state.pipes[0].w < -10) state.pipes.shift();
+        // score advance
+        for (const p of state.pipes) {
+            if (!state.passedIds.has(p.id) && state.bird.x > p.x + p.w) {
+                state.passedIds.add(p.id);
+                state.score++;
+                document.getElementById('score').textContent = String(state.score);
+            }
+        }
+        // coins move/cleanup
+        for (const c of state.coins) {
+            c.x -= speed * dt * (W / 480);
+        }
+        while (state.coins.length && state.coins[0].x < -30) state.coins.shift();
+        // coin collision (circle vs circle)
+        const hbs = state.bird.size * 0.9;
+        const br = hbs * 0.5;
+        const bcx = state.bird.x, bcy = state.bird.y;
+        for (const c of state.coins) {
+            if (!c.collected) {
+                const d = Math.hypot(bcx - c.x, bcy - c.y);
+                if (d < br + c.r * 0.85) {
+                    c.collected = true;
+                    state.score += 5;
+                    document.getElementById('score').textContent = String(state.score);
+                    state.popups.push({x: c.x, y: c.y, text: '+5', a: 1});
+                }
+            }
+        }
+        // pipe collision (AABB vs reduced square)
+        const cbx = state.bird.x - hbs / 2, cby = state.bird.y - hbs / 2;
+        for (const p of state.pipes) {
+            const hitsX = (cbx + hbs) > p.x && cbx < (p.x + p.w);
+            const hitsTop = cby < p.gapTop;
+            const hitsBottom = (cby + hbs) > p.gapBottom;
+            if (hitsX && (hitsTop || hitsBottom)) {
+                gameOver();
+                break;
+            }
+        }
+        // particles
+        updateParticles(dt);
+    }
+
+    // Render helpers
+    function drawHellBackground(ground) {
+        const sky = ctx2d.createLinearGradient(0, 0, 0, H);
+        sky.addColorStop(0, '#130006');
+        sky.addColorStop(0.45, '#220004');
+        sky.addColorStop(1, '#3b0400');
+        ctx2d.fillStyle = sky;
+        ctx2d.fillRect(0, 0, W, H);
+        const t = state.t * 0.0002;
+        ctx2d.fillStyle = '#0b0005';
+        const step = W / 5;
+        for (let i = -2; i < 7; i++) {
+            const x = i * step - (t * W) % step;
+            const peakY = H * 0.45 + ((i & 1) ? 20 : -10);
+            ctx2d.beginPath();
+            ctx2d.moveTo(x, H - ground);
+            ctx2d.lineTo(x + step, H - ground);
+            ctx2d.lineTo(x + step * 0.5, peakY);
+            ctx2d.closePath();
+            ctx2d.fill();
+        }
+        ctx2d.globalAlpha = 0.6;
+        for (let i = 0; i < 40; i++) {
+            const px = (i * 97 + (state.t * 0.06)) % (W + 40) - 20;
+            const py = (H - ground) - ((i * 53) % (H * 0.7)) - (state.t * 0.04 % (H * 0.6));
+            ctx2d.fillStyle = i % 2 ? '#ff7a00' : '#ffd166';
+            ctx2d.fillRect(px, py, 2, 2);
+        }
+        ctx2d.globalAlpha = 1;
+    }
+
+    function drawPillar(p, ground) {
+        const x = p.x, w = p.w;
+        const body = ctx2d.createLinearGradient(x, 0, x + w, 0);
+        body.addColorStop(0, '#0d0a0e');
+        body.addColorStop(0.55, '#1a101c');
+        body.addColorStop(1, '#0d0a0e');
+        ctx2d.fillStyle = body;
+        ctx2d.fillRect(x, 0, w, p.gapTop);
+        ctx2d.fillStyle = '#2a0a0a';
+        ctx2d.fillRect(x, p.gapTop - 8, w, 8);
+        let spikes = Math.max(3, Math.floor(w / 10));
+        ctx2d.fillStyle = '#ff6a00';
+        for (let i = 0; i < spikes; i++) {
+            const sx = x + i * (w / spikes);
+            ctx2d.beginPath();
+            ctx2d.moveTo(sx, p.gapTop - 8);
+            ctx2d.lineTo(sx + (w / spikes) / 2, p.gapTop - 18);
+            ctx2d.lineTo(sx + (w / spikes), p.gapTop - 8);
+            ctx2d.closePath();
+            ctx2d.fill();
+        }
+        ctx2d.fillStyle = body;
+        ctx2d.fillRect(x, p.gapBottom, w, H - p.gapBottom - ground);
+        ctx2d.fillStyle = '#2a0a0a';
+        ctx2d.fillRect(x, p.gapBottom, w, 8);
+        ctx2d.fillStyle = '#ff6a00';
+        for (let i = 0; i < spikes; i++) {
+            const sx = x + i * (w / spikes);
+            ctx2d.beginPath();
+            ctx2d.moveTo(sx, p.gapBottom + 8);
+            ctx2d.lineTo(sx + (w / spikes) / 2, p.gapBottom + 18);
+            ctx2d.lineTo(sx + (w / spikes), p.gapBottom + 8);
+            ctx2d.closePath();
+            ctx2d.fill();
+        }
+    }
+
+    function drawCoin(c) {
+        const g = ctx2d.createRadialGradient(c.x, c.y, 1, c.x, c.y, c.r);
+        g.addColorStop(0, '#fff2a8');
+        g.addColorStop(0.6, '#ffd34d');
+        g.addColorStop(1, '#8a4b00');
+        ctx2d.save();
+        ctx2d.fillStyle = g;
+        ctx2d.beginPath();
+        ctx2d.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+        ctx2d.fill();
+        ctx2d.globalAlpha = 0.35;
+        ctx2d.strokeStyle = '#ffb300';
+        ctx2d.lineWidth = 4;
+        ctx2d.beginPath();
+        ctx2d.arc(c.x, c.y, c.r + 3, 0, Math.PI * 2);
+        ctx2d.stroke();
+        ctx2d.restore();
+    }
+
+    function drawParticles() {
+        ctx2d.save();
+        ctx2d.globalCompositeOperation = 'lighter';
+        for (const p of state.particles) {
+            ctx2d.globalAlpha = Math.max(0, Math.min(1, p.a));
+            ctx2d.fillStyle = '#ff6a00';
+            ctx2d.fillRect(p.x, p.y, 2, 2);
+        }
+        ctx2d.restore();
+    }
+
+    function drawPopups() {
+        for (const m of state.popups) {
+            m.y -= 0.4;
+            m.a -= 0.02;
+        }
+        state.popups = state.popups.filter(m => m.a > 0);
+        ctx2d.save();
+        ctx2d.fillStyle = '#ffd34d';
+        ctx2d.font = 'bold 16px system-ui, sans-serif';
+        for (const m of state.popups) {
+            ctx2d.globalAlpha = m.a;
+            ctx2d.fillText(m.text, m.x + 6, m.y);
+        }
+        ctx2d.restore();
+    }
+
+    // Canvas Score Overlay
+    function drawScoreOverlay() {
+        ctx2d.save();
+        ctx2d.textAlign = 'center';
+        ctx2d.textBaseline = 'top';
+        ctx2d.font = `bold ${Math.round(H * 0.08)}px system-ui, sans-serif`;
+        // Shadow/outline for readability
+        ctx2d.lineWidth = 6;
+        ctx2d.strokeStyle = 'rgba(0,0,0,0.55)';
+        ctx2d.strokeText(String(state.score), W / 2, Math.round(H * 0.04));
+        ctx2d.fillStyle = '#ffffff';
+        ctx2d.fillText(String(state.score), W / 2, Math.round(H * 0.04));
+        ctx2d.restore();
+    }
+
+    // Draw
+    function draw() {
+        const ground = Math.round(H * 0.06);
+        ctx2d.clearRect(0, 0, W, H);
+        drawHellBackground(ground);
+        for (const p of state.pipes) {
+            drawPillar(p, ground);
+        }
+        for (const c of state.coins) {
+            if (!c.collected) drawCoin(c);
+        }
+        const bx = Math.round(state.bird.x - state.bird.size / 2), by = Math.round(state.bird.y - state.bird.size / 2);
+        const img = (performance.now() < showDownUntil && tibDown.complete) ? tibDown : tibUp;
+        if (img && img.complete) {
+            ctx2d.drawImage(img, bx, by, state.bird.size, state.bird.size);
+        } else {
+            ctx2d.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent');
+            ctx2d.fillRect(bx, by, state.bird.size, state.bird.size);
+        }
+        const hbs = state.bird.size * 0.9, hbx = state.bird.x - hbs / 2, hby = state.bird.y - hbs / 2;
+        ctx2d.save();
+        ctx2d.strokeStyle = '#ff3b3b';
+        ctx2d.lineWidth = 2;
+        ctx2d.strokeRect(Math.round(hbx), Math.round(hby), Math.round(hbs), Math.round(hbs));
+        ctx2d.restore();
+        drawParticles();
+        drawPopups();
+        drawScoreOverlay();
+        const lava = ctx2d.createLinearGradient(0, H - ground, 0, H);
+        lava.addColorStop(0, '#ffb300');
+        lava.addColorStop(1, '#ff3b00');
+        ctx2d.fillStyle = lava;
+        ctx2d.fillRect(0, H - ground, W, ground);
+        ctx2d.save();
+        ctx2d.globalAlpha = 0.05;
+        ctx2d.fillStyle = '#000';
+        for (let y = 0; y < H; y += 3) {
+            ctx2d.fillRect(0, y, W, 1);
+        }
+        ctx2d.restore();
+    }
+
+    // Loop & lifecycle
+    let lastTs = 0, rafId;
+
+    function loop(ts) {
+        if (!lastTs) lastTs = ts;
+        const dt = ts - lastTs;
+        lastTs = ts;
+        if (!state.over && !state.paused) {
+            update(dt);
+            draw();
+        }
+        rafId = requestAnimationFrame(loop);
+    }
+
+    function start() {
+        resizeCanvas();
+        reset();
+        state.startedAt = new Date();
+        document.getElementById('startLayer').classList.add('hidden');
+        document.getElementById('gameOverLayer').classList.add('hidden');
+        cancelAnimationFrame(rafId);
+        lastTs = 0;
+        rafId = requestAnimationFrame(loop);
+    }
+
+    function reset() {
+        state.t = 0;
+        state.score = 0;
+        state.pipes.length = 0;
+        state.coins.length = 0;
+        state.particles.length = 0;
+        state.popups.length = 0;
+        state.passedIds.clear();
+        state.bird.x = W * 0.25;
+        state.bird.y = H * 0.5;
+        state.bird.vy = 0;
+        state.over = false;
+        state.paused = false;
+        state.lastPipeAt = -state.pipeEveryMs;
+        document.getElementById('score').textContent = '0';
+    }
+
+    function gameOver() {
+        if (state.over) return;
+        state.over = true;
+        state.endedAt = new Date();
+        if (state.score > state.best) {
+            state.best = state.score;
+            localStorage.setItem('flappy_highscore', String(state.best));
+        }
+        document.getElementById('best').textContent = String(state.best);
+        showSummaryAndSubmit();
+    }
+
+    // Input bindings
+    canvas.addEventListener('pointerdown', flap);
+    canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
+        flap();
+    }, {passive: false});
+    document.addEventListener('keydown', e => {
+        if (e.code === 'Space') {
+            e.preventDefault();
+            if (document.getElementById('startLayer').classList.contains('hidden')) flap(); else start();
+        }
+    });
+    document.getElementById('startBtn').addEventListener('click', start);
+    document.getElementById('againBtn').addEventListener('click', start);
+    document.getElementById('startLayer').addEventListener('pointerdown', e => {
+        if (e.target.id !== 'startBtn') start();
+    });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && CFG.requireVisibility) {
+            state.paused = true;
+        } else {
+            state.paused = false;
+        }
+    });
+
+    // Submit
+    async function postResult(url, token, payload) {
+        const res = await fetch(url, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', ...(token ? {Authorization: `Bearer ${token}`} : {})},
+            body: JSON.stringify(payload),
+            keepalive: true
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json().catch(() => ({status: 'ok'}));
+    }
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+    async function showSummaryAndSubmit() {
+        cancelAnimationFrame(rafId);
+        const layer = document.getElementById('gameOverLayer');
+        const kv = document.getElementById('summary');
+        kv.innerHTML = '';
+        const payload = {
+            partyId: CTX.partyId,
+            playerId: CTX.playerId,
+            gameId: CTX.gameId,
+            sessionId: CTX.sessionId,
+            score: state.score,
+            maxScore: 9999,
+            completed: true,
+            durationMs: state.endedAt - state.startedAt,
+            startedAt: state.startedAt.toISOString(),
+            endedAt: state.endedAt.toISOString(),
+            attempt: 1,
+            metadata: {best: state.best, difficultyAtEnd: difficultyMultiplier()},
+            clientInfo: {userAgent: navigator.userAgent, viewport: {w: innerWidth, h: innerHeight}}
+        };
+        const rows = [["score", payload.score], ["highscore", state.best], ["dauerMs", payload.durationMs], ["startedAt", payload.startedAt], ["endedAt", payload.endedAt]];
+        for (const [k, v] of rows) {
+            const a = document.createElement('div');
+            a.textContent = k;
+            const b = document.createElement('div');
+            b.textContent = String(v);
+            kv.append(a, b);
+        }
+        const submitState = document.getElementById('submitState');
+        const errBox = document.getElementById('errBox');
+        errBox.classList.add('hidden');
+        errBox.textContent = '';
+        layer.classList.remove('hidden');
+        let ok = false, lastErr = null;
+        const {attempts, baseMs} = CFG.backoff;
+        let i = 0;
+        while (i < attempts) {
+            try {
+                submitState.textContent = i ? `Sende… Versuch ${i + 1}/${attempts}` : 'Sende Ergebnis…';
+                const res = await postResult(CFG.callbackUrl, CFG.token, payload);
+                submitState.textContent = 'Ergebnis gespeichert.';
+                ok = true;
+                if (res && res.scoreboardUrl) {
+                    const btn = document.getElementById('scoreboardBtn');
+                    btn.hidden = false;
+                    btn.onclick = () => {
+                        open(res.scoreboardUrl, '_blank');
+                    };
+                }
+                break;
+            } catch (e) {
+                lastErr = e;
+                i++;
+                if (i < attempts) await sleep(baseMs * (2 ** i));
+            }
+        }
+        if (!ok) {
+            submitState.textContent = 'Speichern fehlgeschlagen.';
+            errBox.textContent = lastErr?.message || 'Unbekannter Fehler';
+            errBox.classList.remove('hidden');
+        }
+    }
+
+    // Start
+    (function init() {
+        resizeCanvas();
+        document.getElementById('startLayer').classList.remove('hidden');
+    })();
+</script>
+</body>
+</html>
