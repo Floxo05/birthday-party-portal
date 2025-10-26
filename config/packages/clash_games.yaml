@@ -17,4 +17,4 @@ parameters:
       description: 'Fliege so weit wie möglich durch die Lücken. Touch/Leertaste zum Flappen.'
       icon: '🐤'
       path: '/games/flappy_square/flappy_square_2_tibbers_version.html'
-      image: 'media/games/flappy.svg'
+      image: 'games/flappy_square/Tibbers_mit_Fluegel_oben.png'
