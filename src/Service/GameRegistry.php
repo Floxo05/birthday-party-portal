@@ -14,18 +14,7 @@ final class GameRegistry
      */
     public function __construct(
         private readonly array $games = [],
-        private readonly array $rankPoints = [
-            1 => 15,
-            2 => 12,
-            3 => 10,
-            4 => 8,
-            5 => 6,
-            6 => 5,
-            7 => 4,
-            8 => 3,
-            9 => 2,
-            10 => 1
-        ],
+        private readonly array $rankPoints,
         private readonly GameConfigRepository $configs,
     ) {
     }

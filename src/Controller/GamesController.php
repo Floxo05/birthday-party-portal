@@ -70,17 +70,19 @@ class GamesController extends AbstractController
         $games = array_values(array_filter($games, fn($g) => ($g['status'] ?? 'upcoming') === 'active'));
         usort($games, fn($a, $b) => strcmp($a['title'] ?? '', $b['title'] ?? ''));
 
-        // Build cross-game scoreboard (sum of rank points per member across started games)
+        // Build cross-game scoreboard (sum of rank points per member across completed games)
         $rankPoints = $this->registry->getRankPoints();
         $now = new \DateTimeImmutable();
         $allGames = $this->registry->listGames();
-        // consider games that have started
-        $startedGames = array_values(array_filter($allGames, function (array $g) use ($now)
+        // consider games that are completed (ended by time or explicitly closed)
+        $completedGames = array_values(array_filter($allGames, function (array $g) use ($now)
         {
-            return ($g['startAt'] instanceof \DateTimeImmutable) && $g['startAt'] <= $now;
+            $closed = (bool)($g['closed'] ?? false);
+            $endedByTime = ($g['endAt'] instanceof \DateTimeImmutable) && $g['endAt'] < $now;
+            return $closed || $endedByTime;
         }));
         $aggregate = []; // [string memberId => ['member'=>PartyMember,'points'=>int]]
-        foreach ($startedGames as $g)
+        foreach ($completedGames as $g)
         {
             $lb = $this->scores->getLeaderboard($party, $g['slug'], 1000);
             if (!$lb)
