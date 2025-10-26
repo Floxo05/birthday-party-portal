@@ -249,8 +249,19 @@
 
     const CTX = getCtx();
     const isFileOrigin = (location.origin === 'null' || location.protocol === 'file:');
+
+    function normalizeCallbackUrl(url) {
+        if (!url) return url;
+        try {
+            if (location.protocol === 'https:' && typeof url === 'string' && url.startsWith('http://')) {
+                return 'https://' + url.slice('http://'.length);
+            }
+        } catch (_) {
+        }
+        return url;
+    }
     const CFG = {
-        callbackUrl: CTX.callbackUrl || (isFileOrigin ? null : `${location.origin}/api/game-results`),
+        callbackUrl: normalizeCallbackUrl(CTX.callbackUrl) || (isFileOrigin ? null : `${location.origin}/api/game-results`),
         token: CTX.token || null,
         language: CTX.lang,
         maxDurationMs: window.GAME_CONFIG.maxDurationMs ?? DEFAULTS.maxDurationMs,
