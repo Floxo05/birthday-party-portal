@@ -33,18 +33,7 @@
                     {% if active %}
                         <a class="btn btn-primary" id="startGameBtn" href="{{ playUrl }}" target="_blank"
                            rel="noopener">Spiel starten (neuer Tab)</a>
-                        <small class="text-muted d-block mt-2">Falls der automatische Start blockiert wird, klicke auf
-                            den Button oben.</small>
-                        <script>
-                            window.addEventListener('DOMContentLoaded', function () {
-                                try {
-                                    const w = window.open('{{ playUrl|e('js') }}', '_blank');
-                                    if (!w || w.closed) { /* popup blocked */
-                                    }
-                                } catch (e) {
-                                }
-                            });
-                        </script>
+                        <small class="text-muted d-block mt-2">Tippe auf den Button, um das Spiel zu starten.</small>
                     {% else %}
                         <button class="btn btn-secondary" type="button" disabled>Nicht aktiv</button>
                     {% endif %}
