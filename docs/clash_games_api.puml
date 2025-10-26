@@ -1,0 +1,69 @@
+@startuml
+' Mini-Games API for Clash – Documentation
+' Open flow (GET) and Score submission (POST)
+
+skinparam monochrome true
+skinparam shadowing false
+skinparam ArrowColor Black
+skinparam ActorStyle awesome
+
+actor Player as P
+participant "Browser (Game Tab)" as B
+participant "Static Game (HTML/JS)" as G
+participant "Birthday Portal (Symfony)" as S
+participant "Games API\nPOST /api/party/{id}/games/{slug}/score" as API
+
+== Start Game ==
+P -> S : Open Game Detail\nGET /party/{partyId}/clash/games/{slug}
+S -> P : 200 HTML (detail page)
+S -> P : Button opens new tab to static game URL
+note right of S
+Play URL (GET):
+  {game.path}?
+    partyId={partyId}
+    &playerId={partyMemberId}
+    &gameId={slug}
+    &callbackUrl={absoluteApiUrl}
+end note
+
+P -> B ++ : Open {game.path}?partyId=..&playerId=..&gameId=..&callbackUrl=..
+B -> G ++ : Load static game assets
+G -> G : Read GET params (partyId, playerId, gameId, callbackUrl)
+G -> G : Run gameplay; compute score
+
+== Submit Score ==
+G -> API : POST JSON to callbackUrl
+note right of API
+Endpoint:
+  POST /api/party/{partyId}/games/{slug}/score
+Headers:
+  Content-Type: application/json
+Body (JSON):
+  {
+    partyId: string (UUID),
+    playerId: string (UUID),
+    gameId: string (slug),
+    sessionId: string,
+    score: number,
+    maxScore?: number,
+    completed?: boolean,
+    durationMs?: number,
+    startedAt?: string (ISO),
+    endedAt?: string (ISO),
+    attempt?: number,
+    metadata?: object,
+    clientInfo?: object
+  }
+end note
+API -> S : Validate auth & membership
+API -> S : Check game window (startAt/endAt)
+API -> S : Upsert best score for (party,player,game)
+API -> S : Respond JSON with scoreboardUrl
+API --> G : { status: "ok", bestScore, attempts, scoreboardUrl }
+
+== Finalization ==
+S -> S : After endAt, rank scores and translate ranks
+S -> S : Add points to PartyMember.clashPoints
+S -> S : Mark GameScore.appliedAt (idempotent)
+
+@enduml
