@@ -64,21 +64,30 @@
             {% if leaderboard is empty %}
                 <div class="text-muted">Noch keine Ergebnisse.</div>
             {% else %}
-                <ol class="list-group list-group-numbered">
+                <ul class="list-group">
+                    {% set rank = 0 %}
+                    {% set lastScore = null %}
+                    {% set actual = 0 %}
                     {% for row in leaderboard %}
                         {% set member = row.member %}
                         {% set score = row.score %}
+                        {% set actual = actual + 1 %}
+                        {% if lastScore is null or score != lastScore %}
+                            {% set rank = actual %}
+                            {% set lastScore = score %}
+                        {% endif %}
                         {% set t = member.clashTeam ?? 'A' %}
                         {% set c = colorByTeam[t] %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-              <span>
+              <span class="d-flex align-items-center">
+                <span class="text-muted me-2" style="width: 2.5ch; display: inline-block; text-align: right;">{{ rank }}.</span>
                 <span class="badge bg-{{ c }} me-2">Team {{ tn[t] ?? t }}</span>
                 {{ member.user.username ?? member.user.name }}
               </span>
                             <span class="fw-bold">{{ score }}</span>
                         </li>
                     {% endfor %}
-                </ol>
+                </ul>
             {% endif %}
         </div>
 
