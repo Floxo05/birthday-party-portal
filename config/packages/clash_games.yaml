@@ -1,11 +1,11 @@
 parameters:
   clash_games:
     - slug: 'snake'
-      title: 'Snake'
-      description: 'Friss die Äpfel, ohne dich selbst zu beißen. Sammle möglichst viele Punkte im Zeitraum.'
+      title: 'Holy Chase'
+      description: 'Sammel das Holy um aufzusteigen. Ohne es, bist du nichts.'
       icon: '🐍'
       path: '/games/snake/Snake.html'
-      image: 'media/games/snake.svg'
+      image: 'games/snake/snake.png'
     - slug: 'tetris'
       title: 'Tetris'
       description: 'Staple die Blöcke clever und erreiche den Highscore.'

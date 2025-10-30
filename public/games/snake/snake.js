@@ -273,6 +273,51 @@ function update() {
 
 function draw() {
     const styles = getComputedStyle(document.documentElement);
+    const getVar = (name, fallback) => {
+        const v = styles.getPropertyValue(name);
+        return (v && v.trim().length) ? v.trim() : fallback;
+    };
+    const neonC = getVar('--neon-cyan', '#22d3ee');
+    const neonM = getVar('--neon-magenta', '#f472b6');
+    const snakeBlueVar = getVar('--snake-blue', neonC);
+    const snakePinkVar = getVar('--snake-pink', neonM);
+
+    // Color helpers (hex #rrggbb or rgb(...)) → {r,g,b}
+    const parseColor = (c) => {
+        c = (c || '').trim();
+        if (!c) return {r: 255, g: 255, b: 255};
+        if (c.startsWith('#')) {
+            const hex = c.slice(1);
+            const n = parseInt(hex.length === 3 ? hex.split('').map(ch => ch + ch).join('') : hex, 16);
+            return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+        }
+        const m = c.match(/rgba?\(([^)]+)\)/i);
+        if (m) {
+            const p = m[1].split(',').map(x => parseFloat(x.trim()));
+            return { r: p[0] | 0, g: p[1] | 0, b: p[2] | 0 };
+        }
+        // fallback: try CSS named colors via canvas
+        try {
+            const tmp = document.createElement('canvas').getContext('2d');
+            tmp.fillStyle = c; const comp = tmp.fillStyle; // normalized rgb(...)
+            const mm = comp.match(/rgba?\(([^)]+)\)/i);
+            if (mm) {
+                const p = mm[1].split(',').map(x => parseFloat(x.trim()));
+                return { r: p[0] | 0, g: p[1] | 0, b: p[2] | 0 };
+            }
+        } catch(_) {}
+        return {r: 255, g: 255, b: 255};
+    };
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const mixRgb = (A, B, t) => {
+        const r = Math.round(lerp(A.r, B.r, t));
+        const g = Math.round(lerp(A.g, B.g, t));
+        const b = Math.round(lerp(A.b, B.b, t));
+        return `rgb(${r},${g},${b})`;
+    };
+    const SNAKE_BLUE = parseColor(snakeBlueVar);
+    const SNAKE_PINK = parseColor(snakePinkVar);
+
     // board bg
     g.fillStyle = styles.getPropertyValue('--board');
     g.fillRect(0, 0, W, H);
@@ -297,18 +342,27 @@ function draw() {
         } else {
             const ax = a.x * CELL + CELL / 2, ay = a.y * CELL + CELL / 2,
                 r = Math.max(6, CELL / 2 - 3);
-            g.fillStyle = styles.getPropertyValue('--apple');
+            // Neon apple: glossy radial gradient + soft rim
+            const cC = (styles.getPropertyValue('--neon-cyan') || '#22d3ee').trim();
+            const cM = (styles.getPropertyValue('--neon-magenta') || '#f472b6').trim();
+            const grad = g.createRadialGradient(ax - r * 0.3, ay - r * 0.35, r * 0.15, ax, ay, r);
+            grad.addColorStop(0, 'rgba(255,255,255,0.85)');
+            grad.addColorStop(0.18, cM);
+            grad.addColorStop(0.85, cC);
+            grad.addColorStop(1, 'rgba(0,0,0,0.05)');
+            g.fillStyle = grad;
             g.beginPath();
             g.arc(ax, ay, r, 0, Math.PI * 2);
             g.fill();
-            g.fillStyle = '#7c3f00';
-            g.fillRect(ax - 2, ay - r - 6, 4, 8);
-            g.fillStyle = '#16a34a';
+            // soft rim
+            g.save();
+            g.globalAlpha = 0.35;
+            g.strokeStyle = cM;
+            g.lineWidth = Math.max(1, CELL / 18);
             g.beginPath();
-            g.moveTo(ax + 3, ay - r - 4);
-            g.quadraticCurveTo(ax + 10, ay - r - 10, ax + 14, ay - r - 2);
-            g.quadraticCurveTo(ax + 8, ay - r + 1, ax + 3, ay - r - 4);
-            g.fill();
+            g.arc(ax, ay, r - g.lineWidth * 0.6, 0, Math.PI * 2);
+            g.stroke();
+            g.restore();
         }
     }
     // snake body + tail/head with images
@@ -346,15 +400,15 @@ function draw() {
         g.restore();
     };
 
-    // Draw all body segments including tail (but excluding the head), using body sprite or vector
-    for (let i = 0; i < state.snake.length - 1; i++) {
+
+    // Draw all body segments (exclude head): flat color blocks with tail→head gradient (pink→blue), no dots/glow
+    const bodyLen = Math.max(0, state.snake.length - 1);
+    for (let i = 0; i < bodyLen; i++) {
         const s = state.snake[i];
-        if (ASSETS.body.ok && ASSETS.body.img) {
-            g.imageSmoothingEnabled = false;
-            g.drawImage(ASSETS.body.img, s.x * CELL, s.y * CELL, CELL, CELL);
-        } else {
-            rr(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2, Math.min(6, CELL / 3));
-        }
+        const denom = Math.max(1, bodyLen - 1);
+        const t = denom > 0 ? (i / denom) : 0; // 0 at tail, 1 at pre-head
+        g.fillStyle = mixRgb(SNAKE_PINK, SNAKE_BLUE, clamp(t, 0, 1));
+        rr(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2, Math.min(6, CELL / 3));
     }
 
     // head (image or vector fallback)
@@ -371,12 +425,9 @@ function draw() {
         } else {
             const boardCol = styles.getPropertyValue('--board');
             const cx = hx + CELL / 2, cy = hy + CELL / 2;
-            // base square
+            // Flat head: solid blue block, no glow/highlight
+            g.fillStyle = snakeBlueVar;
             rr(hx + 1, hy + 1, CELL - 2, CELL - 2, Math.min(6, CELL / 3));
-            // Outline
-            g.strokeStyle = 'rgba(0,0,0,.35)';
-            g.lineWidth = 2;
-            g.strokeRect(hx + 1, hy + 1, CELL - 2, CELL - 2);
             // Eyes
             const eyeR = Math.max(2, Math.floor(CELL / 10));
             let ex1, ey1, ex2, ey2;
@@ -425,7 +476,7 @@ function draw() {
                 g.closePath();
                 g.fill();
                 if (openT > 0.5) {
-                    g.strokeStyle = '#ef4444';
+                    g.strokeStyle = neonM;
                     g.lineWidth = Math.max(2, CELL / 12);
                     g.beginPath();
                     g.moveTo(cx, cy);
@@ -615,7 +666,7 @@ async function showSummaryAndSubmit() {
                 const btn = document.getElementById('scoreboardBtn');
                 btn.hidden = false;
                 btn.onclick = () => {
-                    open(res.scoreboardUrl, '_blank');
+                    open(res.scoreboardUrl);
                 };
             }
             break;
