@@ -11,6 +11,7 @@ use App\Entity\ShopItem;
 use App\Entity\User;
 use App\Service\PartyMember\PartyMembershipManager\PartyMembershipManagerInterface;
 use Doctrine\DBAL\ConnectionException;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class ShopPurchaseService
@@ -70,7 +71,7 @@ final class ShopPurchaseService
             $lockedItem = $this->entityManager->getRepository(ShopItem::class)
                 ->find($item->getId());
 
-            $this->entityManager->lock($lockedItem, \Doctrine\ORM\LockMode::PESSIMISTIC_WRITE);
+            $this->entityManager->lock($lockedItem, LockMode::PESSIMISTIC_WRITE);
 
             $available = max(0, $lockedItem->getQuantity());
             $price = max(0, $lockedItem->getPricePoints());
