@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ item.name }} – Shop – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('shop_list', {id: party.id}) }}" class="btn btn-link">← Zurück zum Shop</a>
+        <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-link">← Zurück zur Party</a>
+        <h1 class="h3">{{ item.name }}</h1>
+        <p class="text-muted">Guthaben: <strong>{{ balance }}</strong> Punkte · Preis: <strong>{{ item.pricePoints }}</strong> · Lager: <strong>{{ item.quantity }}</strong></p>
+        <div class="mt-2">
+            <a href="{{ path('purchased_list', {id: party.id}) }}" class="btn btn-outline-secondary btn-sm">Meine Gegenstände ansehen</a>
+        </div>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-12 col-md-6">
+            {% if item.media %}
+                <img src="{{ path('app_media_view', {id: item.media.id}) }}" class="img-fluid rounded border" alt="{{ item.name }}">
+            {% else %}
+                <div class="bg-light border rounded" style="height: 300px;"></div>
+            {% endif %}
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <h2 class="h5">Beschreibung</h2>
+                <p class="mb-0">{{ item.description ?: 'Keine Beschreibung' }}</p>
+            </div>
+
+            {% set maxByBalance = item.pricePoints > 0 ? (balance // item.pricePoints) : item.quantity %}
+            {% set maxQty = min([item.quantity, maxByBalance]) %}
+
+            <form method="post" action="{{ path('shop_buy', {id: party.id, itemId: item.id}) }}" onsubmit="return confirm('Willst du \'' + '{{ item.name|e('js') }}' + '\' wirklich kaufen?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('shop-buy-' ~ item.id) }}">
+                <div class="input-group mb-2" style="max-width: 320px;">
+                    <input type="number" class="form-control" name="quantity" value="1" min="1" max="{{ maxQty }}" {% if maxQty == 0 %}disabled{% endif %}>
+                    <button class="btn btn-primary" type="submit" {% if maxQty == 0 %}disabled{% endif %}>Kaufen</button>
+                </div>
+                {% if maxQty == 0 %}
+                    <div class="form-text text-danger">Nicht genug Punkte oder ausverkauft.</div>
+                {% endif %}
+            </form>
+        </div>
+    </section>
+{% endblock %}

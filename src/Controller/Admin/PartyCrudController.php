@@ -141,12 +141,22 @@ class PartyCrudController extends AbstractCrudController
                 ->generateUrl()
             );
 
+        $createShopItem = Action::new('createShopItem', 'Shop-Item erstellen')
+            ->linkToUrl(fn(Party $party) => $this->adminUrlGenerator
+                ->unsetAll()
+                ->setController(ShopItemCrudController::class)
+                ->setAction(Action::NEW)
+                ->set('party_id', $party->getId())
+                ->generateUrl()
+            );
+
         return parent::configureActions($actions)
             ->disable(Action::SAVE_AND_ADD_ANOTHER)
             ->disable(Action::SAVE_AND_CONTINUE)
             ->add(Crud::PAGE_EDIT, Action::DETAIL)
             ->add(Crud::PAGE_DETAIL, $createInvitation)
-            ->add(Crud::PAGE_DETAIL, $createPartyNews);
+            ->add(Crud::PAGE_DETAIL, $createPartyNews)
+            ->add(Crud::PAGE_DETAIL, $createShopItem);
     }
 
     #[Override]

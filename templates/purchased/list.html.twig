@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Meine Gegenstände – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-link">← Zurück zur Party</a>
+        <a href="{{ path('shop_list', {id: party.id}) }}" class="btn btn-link">← Zum Shop</a>
+        <h1 class="h3">Meine erworbenen Gegenstände</h1>
+        <p class="text-muted">Nur für dich sichtbar.</p>
+    </section>
+
+    <section>
+        {% if items|length == 0 %}
+            <div class="alert alert-info">Du hast noch nichts gekauft.</div>
+        {% else %}
+            <style>
+                /* Mobile-first: horizontal tiles with image left, content right */
+                .purchased-tile { display: flex; flex-direction: row; }
+                .purchased-tile-img { width: 96px; height: 96px; object-fit: cover; }
+                .purchased-tile-img-placeholder { width: 96px; height: 96px; }
+                .purchased-tile-body { display: flex; flex-direction: column; }
+                @media (min-width: 768px) { /* md and up: vertical card style */
+                    .purchased-tile { display: block; }
+                    .purchased-tile-img, .purchased-tile-img-placeholder { width: 100%; height: 120px; }
+                }
+            </style>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for item in items %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm purchased-tile">
+                            <a href="{{ path('purchased_detail', {id: party.id, purchasedId: item.id}) }}" class="text-decoration-none text-reset flex-shrink-0">
+                                {% if item.media %}
+                                    <img src="{{ path('app_media_view', {id: item.media.id}) }}" class="purchased-tile-img" alt="{{ item.name }}">
+                                {% else %}
+                                    <div class="bg-light purchased-tile-img-placeholder"></div>
+                                {% endif %}
+                            </a>
+                            <div class="card-body purchased-tile-body">
+                                <a href="{{ path('purchased_detail', {id: party.id, purchasedId: item.id}) }}" class="text-decoration-none text-reset"><h5 class="card-title mb-1">{{ item.name }}</h5></a>
+                                <div class="mb-2 small text-muted">Erworben am: {{ item.acquiredAt|date('d.m.Y H:i') }}</div>
+                                {% if item.description %}
+                                    <div class="small text-muted text-truncate" style="max-width: 100%">{{ item.description }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

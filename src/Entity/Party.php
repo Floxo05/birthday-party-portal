@@ -63,6 +63,12 @@ class Party implements \Stringable
     private Collection $partyNews;
 
     /**
+     * @var Collection<int, ShopItem>
+     */
+    #[ORM\OneToMany(targetEntity: ShopItem::class, mappedBy: 'party', orphanRemoval: true)]
+    private Collection $shopItems;
+
+    /**
      * @var Collection<int, PartyGroup>
      */
     #[ORM\OneToMany(targetEntity: PartyGroup::class, mappedBy: 'party', cascade: ['persist', 'remove'], orphanRemoval: true)]
@@ -82,6 +88,7 @@ class Party implements \Stringable
         $this->invitations = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->partyNews = new ArrayCollection();
+        $this->shopItems = new ArrayCollection();
         $this->groups = new ArrayCollection();
     }
 
@@ -303,6 +310,36 @@ class Party implements \Stringable
     {
         $this->foreshadowing = $foreshadowing;
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ShopItem>
+     */
+    public function getShopItems(): Collection
+    {
+        return $this->shopItems;
+    }
+
+    public function addShopItem(ShopItem $item): static
+    {
+        if (!$this->shopItems->contains($item))
+        {
+            $this->shopItems->add($item);
+            $item->setParty($this);
+        }
+        return $this;
+    }
+
+    public function removeShopItem(ShopItem $item): static
+    {
+        if ($this->shopItems->removeElement($item))
+        {
+            if ($item->getParty() === $this)
+            {
+                $item->setParty(null);
+            }
+        }
         return $this;
     }
 }
