@@ -254,7 +254,7 @@ function place() {
 
 function updateLevel() {
     game.level = 1 + Math.floor(game.lines / 8);
-    game.fallMs = Math.max(80, 700 - (game.level - 1) * 120);
+    game.fallMs = Math.max(80, 600 - (game.level - 1) * 60);
     document.getElementById('speed').textContent = `Fallrate: ${game.fallMs}ms`;
     document.getElementById('level').textContent = game.level;
     // apply level-based theme
