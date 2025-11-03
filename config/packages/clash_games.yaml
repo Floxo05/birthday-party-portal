@@ -7,7 +7,7 @@ parameters:
       path: '/games/snake/Snake.html'
       image: 'games/snake/snake.png'
     - slug: 'tetris'
-      title: "Mutti's Lieblingsspiel"
+      title: "Muttis Lieblingsspiel"
       description: 'Staple die Blöcke clever und erreiche den Highscore.'
       icon: '🧩'
       path: '/games/tetris/Tetris.html'
