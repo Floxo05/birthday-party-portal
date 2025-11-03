@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ item.name }} – Mein Gegenstand – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('purchased_list', {id: party.id}) }}" class="btn btn-link">← Zurück zur Übersicht</a>
+        <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-link">← Zurück zur Party</a>
+        <h1 class="h3">{{ item.name }}</h1>
+        <p class="text-muted">Erworben am: <strong>{{ item.acquiredAt|date('d.m.Y H:i') }}</strong></p>
+    </section>
+
+    <section class="row g-4">
+        <div class="col-12 col-md-6">
+            {% if item.media %}
+                <img src="{{ path('app_media_view', {id: item.media.id}) }}" class="img-fluid rounded border" alt="{{ item.name }}">
+            {% else %}
+                <div class="bg-light border rounded" style="height: 300px;"></div>
+            {% endif %}
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="mb-3">
+                <h2 class="h5">Beschreibung</h2>
+                <p class="mb-0">{{ item.description ?: 'Keine Beschreibung' }}</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

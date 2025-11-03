@@ -1,0 +1,523 @@
+:root {
+    --bg: #0b0f17;
+    --fg: #e6ecf2;
+    --muted: #94a3b8;
+    --board: #0f172a;
+    --grid: #1c2844;
+    --accent: #2563eb;
+    --ghost: #37415188;
+    --cI: #06b6d4;
+    --cJ: #3b82f6;
+    --cL: #f59e0b;
+    --cO: #fbbf24;
+    --cS: #22c55e;
+    --cT: #a855f7;
+    --cZ: #ef4444;
+    /* Fixed bars sizing */
+    --headerH: clamp(44px, 7svh, 56px);
+    --footerH: clamp(36px, 6svh, 48px);
+}
+
+html, body {
+    margin: 0;
+    height: 100svh;
+    background: var(--bg);
+    color: var(--fg);
+    font: 16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    overflow: hidden; /* no page scroll, full-viewport layout */
+}
+
+body.playing {
+    overflow: hidden
+}
+
+.shell {
+    display: grid;
+    grid-template-rows: var(--headerH) 1fr var(--footerH);
+    min-height: 100svh;
+}
+
+header, footer {
+    box-sizing: border-box;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, .03);
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+}
+
+footer {
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    border-bottom: 0
+}
+
+h1 {
+    margin: 0;
+    font-size: clamp(18px, 3.5vw, 24px)
+}
+
+.row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap
+}
+
+.grow {
+    flex: 1
+}
+
+main {
+    display: grid;
+    place-items: center;
+    padding: 12px;
+    height: calc(100svh - var(--headerH) - var(--footerH));
+    overflow: hidden; /* no scroll inside main */
+}
+
+.card {
+    width: min(980px, 100%);
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .25);
+    padding: 12px;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr; /* HUD + stage */
+    overflow: hidden;
+}
+
+.hud {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px
+}
+
+.stage {
+    display: grid;
+    grid-template-columns: 1fr; /* single column: only the board */
+    gap: 12px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.boardWrap {
+    display: grid;
+    place-items: center;
+    position: relative;
+    height: 100%;
+}
+
+canvas#board {
+    /* Size is set dynamically via JS inline style to fit available area exactly */
+    max-width: 100%;
+    max-height: 100%;
+    background: var(--board);
+    display: block;
+    touch-action: none; /* prevent browser gestures while playing */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.boardWrap {
+    overscroll-behavior: contain; /* avoid page bounce on swipe */
+}
+
+.sidebar {
+    width: min(38vw, 260px);
+    display: grid;
+    gap: 12px;
+    align-content: start
+}
+
+.box {
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 12px;
+    padding: 10px
+}
+
+.nextGrid {
+    display: grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap: 8px
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .12);
+    font-size: 12px
+}
+
+.overlay {
+    position: relative
+}
+
+.layer {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, .45);
+    backdrop-filter: blur(2px);
+    z-index: 10;
+    pointer-events: auto
+}
+
+.panel {
+    position: relative;
+    z-index: 11;
+    pointer-events: auto
+}
+
+.layer.hidden {
+    display: none
+}
+
+.panel {
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 16px;
+    padding: 18px 20px;
+    text-align: center;
+    max-width: min(92vw, 820px)
+}
+
+button {
+    appearance: none;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff
+}
+
+button.secondary {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid rgba(255, 255, 255, .18)
+}
+
+.err {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 0, 0, .35);
+    background: rgba(255, 0, 0, .1)
+}
+
+@media (max-width: 800px) {
+    .stage {
+        grid-template-columns:1fr
+    }
+}
+
+/* Floating next preview in top-right of the board */
+.nextFloat {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 6px 6px 4px 6px;
+    z-index: 5;
+    pointer-events: none; /* do not block game gestures */
+}
+
+.nextFloat .title {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0 0 4px 2px;
+}
+
+.nextFloat canvas {
+    display: block;
+    background: rgba(255, 255, 255, .03);
+    border-radius: 8px;
+}
+
+/* === Level-based Themes === */
+:root.theme-neon {
+    --bg: #0b0f24;
+    --fg: #e9f1ff;
+    --muted: #8ea3c1;
+    --board: #0f1330;
+    --grid: rgba(120, 160, 255, 0.12);
+    --ghost: rgba(200, 220, 255, 0.28);
+    --cI: #00e5ff;
+    --cJ: #6c7dff;
+    --cL: #ffb74d;
+    --cO: #ffd54f;
+    --cS: #66ee88;
+    --cT: #d066ff;
+    --cZ: #ff6b6b;
+}
+
+:root.theme-ocean {
+    --bg: #08141b;
+    --fg: #e4fbff;
+    --muted: #93b7c4;
+    --board: #0b2230;
+    --grid: rgba(130, 200, 220, 0.10);
+    --ghost: rgba(180, 230, 255, 0.25);
+    --cI: #00acc1;
+    --cJ: #2962ff;
+    --cL: #ff8a65;
+    --cO: #ffd740;
+    --cS: #26a69a;
+    --cT: #7e57c2;
+    --cZ: #ef5350;
+}
+
+:root.theme-sunset {
+    --bg: #1c0f11;
+    --fg: #fff3e0;
+    --muted: #e0bfa6;
+    --board: #2a1215;
+    --grid: rgba(255, 200, 140, 0.12);
+    --ghost: rgba(255, 220, 200, 0.30);
+    --cI: #26c6da;
+    --cJ: #5c6bc0;
+    --cL: #ff7043;
+    --cO: #ffca28;
+    --cS: #81c784;
+    --cT: #ba68c8;
+    --cZ: #e57373;
+}
+
+:root.theme-contrast {
+    --bg: #000000;
+    --fg: #ffffff;
+    --muted: #cccccc;
+    --board: #000000;
+    --grid: rgba(255, 255, 255, 0.20);
+    --ghost: rgba(255, 255, 255, 0.35);
+    --cI: #00ffff;
+    --cJ: #0080ff;
+    --cL: #ffa500;
+    --cO: #ffff00;
+    --cS: #00ff00;
+    --cT: #bf00ff;
+    --cZ: #ff0000;
+}
+
+
+/* === THEME & GLOW VARIABLES ===
+   Each theme overrides these CSS variables:
+   --bg, --fg, --muted, --board, --grid, --ghost, --accent
+   Tetromino colors: --cI --cJ --cL --cO --cS --cT --cZ
+   Glow: --glow (color for block glow), --glowStrength (px @ CELL=24)
+*/
+:root {
+    --glow: rgba(255, 255, 255, 0.45);
+    --glowStrength: 10; /* base blur in px at CELL=24; scaled at runtime */
+    /* Smoothen theme switches */
+    --transitionMs: 260ms;
+}
+
+/* Optional transitions for soft theme changes */
+:root, body, canvas#board {
+    transition: background var(--transitionMs) linear, color var(--transitionMs) linear;
+}
+
+/* Corrected theme selectors + additional themes */
+:root.theme-neon {
+    --bg: #0b0f24;
+    --fg: #e9f1ff;
+    --muted: #8ea3c1;
+    --board: #0f1330;
+    --grid: rgba(120, 160, 255, 0.12);
+    --ghost: rgba(200, 220, 255, 0.28);
+    --accent: #7aa2ff;
+    --glow: rgba(120, 160, 255, 0.55);
+    --glowStrength: 12;
+    --cI: #00e5ff;
+    --cJ: #6c7dff;
+    --cL: #ffb74d;
+    --cO: #ffd54f;
+    --cS: #66ee88;
+    --cT: #d066ff;
+    --cZ: #ff6b6b;
+}
+
+:root.theme-ocean {
+    --bg: #08141b;
+    --fg: #e4fbff;
+    --muted: #93b7c4;
+    --board: #0b2230;
+    --grid: rgba(130, 200, 220, 0.10);
+    --ghost: rgba(180, 230, 255, 0.25);
+    --accent: #2ac1e0;
+    --glow: rgba(120, 200, 255, 0.5);
+    --glowStrength: 11;
+    --cI: #00acc1;
+    --cJ: #2962ff;
+    --cL: #ff8a65;
+    --cO: #ffd740;
+    --cS: #26a69a;
+    --cT: #7e57c2;
+    --cZ: #ef5350;
+}
+
+:root.theme-sunset {
+    --bg: #1c0f11;
+    --fg: #fff3e0;
+    --muted: #e0bfa6;
+    --board: #2a1215;
+    --grid: rgba(255, 200, 140, 0.12);
+    --ghost: rgba(255, 220, 200, 0.30);
+    --accent: #ff9d5b;
+    --glow: rgba(255, 180, 120, 0.5);
+    --glowStrength: 12;
+    --cI: #26c6da;
+    --cJ: #5c6bc0;
+    --cL: #ff7043;
+    --cO: #ffca28;
+    --cS: #81c784;
+    --cT: #ba68c8;
+    --cZ: #e57373;
+}
+
+:root.theme-contrast {
+    --bg: #000;
+    --fg: #fff;
+    --muted: #ccc;
+    --board: #000;
+    --grid: rgba(255, 255, 255, 0.20);
+    --ghost: rgba(255, 255, 255, 0.35);
+    --accent: #fff;
+    --glow: rgba(255, 255, 255, 0.65);
+    --glowStrength: 13;
+    --cI: #00ffff;
+    --cJ: #0080ff;
+    --cL: #ffa500;
+    --cO: #ffff00;
+    --cS: #00ff00;
+    --cT: #bf00ff;
+    --cZ: #ff0000;
+}
+
+:root.theme-forest {
+    --bg: #0b120d;
+    --fg: #e7ffe7;
+    --muted: #a2c8a2;
+    --board: #0f1a12;
+    --grid: rgba(120, 200, 140, 0.12);
+    --ghost: rgba(200, 255, 220, 0.28);
+    --accent: #3ddc84;
+    --glow: rgba(100, 220, 160, 0.5);
+    --glowStrength: 11;
+    --cI: #3de0c9;
+    --cJ: #2c7a7b;
+    --cL: #b5e07a;
+    --cO: #d8ff7a;
+    --cS: #36d399;
+    --cT: #7cd1b8;
+    --cZ: #e4606d;
+}
+
+:root.theme-magma {
+    --bg: #180b0b;
+    --fg: #ffe6e0;
+    --muted: #ffb7a6;
+    --board: #220e0e;
+    --grid: rgba(255, 120, 80, 0.12);
+    --ghost: rgba(255, 180, 140, 0.32);
+    --accent: #ff7043;
+    --glow: rgba(255, 120, 80, 0.55);
+    --glowStrength: 14;
+    --cI: #ff8a65;
+    --cJ: #ff7043;
+    --cL: #ff5722;
+    --cO: #ffb300;
+    --cS: #ff9e80;
+    --cT: #ff6e6e;
+    --cZ: #ff3b30;
+}
+
+:root.theme-ice {
+    --bg: #0a0f16;
+    --fg: #e8f6ff;
+    --muted: #a6c4d8;
+    --board: #0c1622;
+    --grid: rgba(160, 200, 255, 0.12);
+    --ghost: rgba(200, 230, 255, 0.32);
+    --accent: #7cc7ff;
+    --glow: rgba(160, 210, 255, 0.55);
+    --glowStrength: 12;
+    --cI: #9ad8ff;
+    --cJ: #6fa8ff;
+    --cL: #9ec8ff;
+    --cO: #f6ff7a;
+    --cS: #9af0e0;
+    --cT: #a6a6ff;
+    --cZ: #ff8aa6;
+}
+
+:root.theme-candy {
+    --bg: #160e16;
+    --fg: #ffe9fb;
+    --muted: #f5b3de;
+    --board: #241225;
+    --grid: rgba(255, 180, 230, 0.12);
+    --ghost: rgba(255, 210, 240, 0.32);
+    --accent: #ff7ac6;
+    --glow: rgba(255, 150, 220, 0.55);
+    --glowStrength: 13;
+    --cI: #7ae7ff;
+    --cJ: #a67aff;
+    --cL: #ffb36b;
+    --cO: #ffd86b;
+    --cS: #7affc6;
+    --cT: #ff7ad1;
+    --cZ: #ff7999;
+}
+
+:root.theme-cyber {
+    --bg: #0a0a12;
+    --fg: #e6faff;
+    --muted: #9ad4e0;
+    --board: #0d0d20;
+    --grid: rgba(0, 255, 200, 0.12);
+    --ghost: rgba(0, 255, 200, 0.28);
+    --accent: #00ffd1;
+    --glow: rgba(0, 255, 200, 0.6);
+    --glowStrength: 14;
+    --cI: #00fff0;
+    --cJ: #4db1ff;
+    --cL: #ffc04d;
+    --cO: #ffe64d;
+    --cS: #00ff9c;
+    --cT: #a84dff;
+    --cZ: #ff5a87;
+}
+
+:root.theme-mono {
+    --bg: #0a0a0a;
+    --fg: #f0f0f0;
+    --muted: #bdbdbd;
+    --board: #0f0f0f;
+    --grid: rgba(255, 255, 255, 0.10);
+    --ghost: rgba(255, 255, 255, 0.30);
+    --accent: #9e9e9e;
+    --glow: rgba(255, 255, 255, 0.4);
+    --glowStrength: 10;
+    --cI: #d0d0d0;
+    --cJ: #c0c0c0;
+    --cL: #e0e0e0;
+    --cO: #f0f0f0;
+    --cS: #bdbdbd;
+    --cT: #e6e6e6;
+    --cZ: #a6a6a6;
+}

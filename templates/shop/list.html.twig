@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Shop – {{ party.title }}{% endblock %}
+
+{% block body %}
+    <section class="mb-3">
+        <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-link">← Zurück zur Party</a>
+        <h1 class="h3">Shop</h1>
+        <p class="text-muted">Verfügbares Guthaben: <strong>{{ balance }}</strong> Punkte</p>
+        <div class="mt-2">
+            <a href="{{ path('purchased_list', {id: party.id}) }}" class="btn btn-outline-secondary btn-sm">Meine Gegenstände ansehen</a>
+        </div>
+    </section>
+
+    <section>
+        {% if items|length == 0 %}
+            <div class="alert alert-info">Noch keine Artikel verfügbar.</div>
+        {% else %}
+            <style>
+                /* Mobile-first: horizontal tiles with image left, content right */
+                .shop-tile { display: flex; flex-direction: row; }
+                .shop-tile-img { width: 96px; height: 96px; object-fit: cover; }
+                .shop-tile-img-placeholder { width: 96px; height: 96px; }
+                .shop-tile-body { display: flex; flex-direction: column; }
+                @media (min-width: 768px) { /* md and up: keep previous vertical card style */
+                    .shop-tile { display: block; }
+                    .shop-tile-img, .shop-tile-img-placeholder { width: 100%; height: 120px; }
+                }
+            </style>
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                {% for item in items %}
+                    <div class="col">
+                        <div class="card h-100 shadow-sm shop-tile">
+                            <a href="{{ path('shop_item_detail', {id: party.id, itemId: item.id}) }}" class="text-decoration-none text-reset flex-shrink-0">
+                                {% if item.media %}
+                                    <img src="{{ path('app_media_view', {id: item.media.id}) }}" class="shop-tile-img" alt="{{ item.name }}">
+                                {% else %}
+                                    <div class="bg-light shop-tile-img-placeholder"></div>
+                                {% endif %}
+                            </a>
+                            <div class="card-body shop-tile-body">
+                                <a href="{{ path('shop_item_detail', {id: party.id, itemId: item.id}) }}" class="text-decoration-none text-reset"><h5 class="card-title mb-1">{{ item.name }}</h5></a>
+                                <div class="mb-2 small text-muted">Preis: {{ item.pricePoints }} · Lager: {{ item.quantity }}</div>
+
+                                {% set maxByBalance = item.pricePoints > 0 ? (balance // item.pricePoints) : item.quantity %}
+                                {% set maxQty = min([item.quantity, maxByBalance]) %}
+
+                                <form method="post" action="{{ path('shop_buy', {id: party.id, itemId: item.id}) }}" class="mt-auto" onsubmit="return confirm('Willst du \'' + '{{ item.name|e('js') }}' + '\' wirklich kaufen?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('shop-buy-' ~ item.id) }}">
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="quantity" value="1" min="1" max="{{ maxQty }}" {% if maxQty == 0 %}disabled{% endif %}>
+                                        <button class="btn btn-primary" type="submit" {% if maxQty == 0 %}disabled{% endif %}>Kaufen</button>
+                                    </div>
+                                    {% if maxQty == 0 %}
+                                        <div class="form-text text-danger">Nicht genug Punkte oder ausverkauft.</div>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

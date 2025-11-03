@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Entity\GameConfig;
 use App\Entity\Invitation;
 use App\Entity\Media;
 use App\Entity\Party;
@@ -47,11 +48,12 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Einladung', 'fa fa-envelope-open-text', Invitation::class);
         yield MenuItem::linkToCrud('Medien', 'fa fa-file', Media::class);
         yield MenuItem::linkToCrud('Nachrichten', 'fa fa-comments', PartyNews::class);
+        yield MenuItem::linkToCrud('Shop-Items', 'fa fa-cart-shopping', \App\Entity\ShopItem::class);
         yield MenuItem::section('Gruppen');
         yield MenuItem::linkToCrud('Gruppen', 'fa fa-users', PartyGroup::class);
         yield MenuItem::linkToCrud('Gruppenzuweisungen', 'fa fa-user-plus', PartyGroupAssignment::class);
         yield MenuItem::section('Clash');
-        yield MenuItem::linkToCrud('Spiele-Fenster', 'fa fa-gamepad', \App\Entity\GameConfig::class);
+        yield MenuItem::linkToCrud('Spiele-Fenster', 'fa fa-gamepad', GameConfig::class);
         yield MenuItem::section('Super-Admin');
         yield MenuItem::linkToCrud('Nutzer', 'fa fa-user', User::class)
             ->setPermission(Role::ADMIN->value);

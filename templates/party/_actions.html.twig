@@ -12,5 +12,5 @@
         </a>
     {% endif %}
     
-    <button class="btn btn-outline-success" disabled>Zum Shop (bald verfügbar)</button>
+    <a class="btn btn-outline-success" href="{{ path('shop_list', { id: party.id }) }}">Zum Shop</a>
 </div>

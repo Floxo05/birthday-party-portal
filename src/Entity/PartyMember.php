@@ -6,6 +6,8 @@ namespace App\Entity;
 
 use App\Enum\ResponseStatus;
 use App\Repository\PartyMemberRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Uid\Uuid;
@@ -19,6 +21,11 @@ abstract class PartyMember
 {
     const string ROLE_HOST = 'Host';
     const string ROLE_GUEST = 'Guest';
+
+    public function __construct()
+    {
+        $this->purchasedItems = new ArrayCollection();
+    }
 
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -44,6 +51,15 @@ abstract class PartyMember
 
     #[ORM\Column(name: 'clash_points', type: 'integer', options: ['default' => 0])]
     private int $clashPoints = 0;
+
+    #[ORM\Column(name: 'points_spend', type: 'integer', options: ['default' => 0])]
+    private int $pointsSpend = 0;
+
+    /**
+     * @var Collection<int, PurchasedItem>
+     */
+    #[ORM\OneToMany(targetEntity: PurchasedItem::class, mappedBy: 'owner', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $purchasedItems;
 
     public function getId(): ?Uuid
     {
@@ -119,6 +135,58 @@ abstract class PartyMember
     public function setClashPoints(int $clashPoints): static
     {
         $this->clashPoints = max(0, $clashPoints);
+        // ensure pointsSpend does not exceed clashPoints
+        if ($this->pointsSpend > $this->clashPoints) {
+            $this->pointsSpend = $this->clashPoints;
+        }
+        return $this;
+    }
+
+    public function getPointsSpend(): int
+    {
+        return $this->pointsSpend;
+    }
+
+    public function setPointsSpend(int $pointsSpend): static
+    {
+        $pointsSpend = max(0, $pointsSpend);
+        // cannot spend more than clash points
+        $this->pointsSpend = min($pointsSpend, $this->clashPoints);
+        return $this;
+    }
+
+    public function getBalance(): int
+    {
+        return max(0, $this->clashPoints - $this->pointsSpend);
+    }
+
+    /**
+     * @return Collection<int, PurchasedItem>
+     */
+    public function getPurchasedItems(): Collection
+    {
+        return $this->purchasedItems;
+    }
+
+    public function addPurchasedItem(PurchasedItem $item): static
+    {
+        if (!$this->purchasedItems->contains($item))
+        {
+            $this->purchasedItems->add($item);
+            $item->setOwner($this);
+        }
+        return $this;
+    }
+
+    public function removePurchasedItem(PurchasedItem $item): static
+    {
+        if ($this->purchasedItems->removeElement($item))
+        {
+            if ($item->getOwner() === $this)
+            {
+                $item->setOwner(null);
+            }
+        }
         return $this;
     }
 
