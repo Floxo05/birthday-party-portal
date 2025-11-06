@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clash – Archiv: {{ game.title }}{% endblock %}
+
+{% block body %}
+    <div class="container py-4">
+        <div class="d-flex align-items-center gap-2 mb-2">
+            <h1 class="mb-0">Archiv: {{ game.title }}</h1>
+            <span class="fs-3" aria-hidden="true">{{ game.icon ?? '🎮' }}</span>
+        </div>
+        <p class="text-muted">Übungsmodus – deine Ergebnisse zählen <strong>nicht</strong> für den Clash.</p>
+
+        <div class="mb-3">
+            <h5>Highscore (Archiv)</h5>
+            {% if leaderboard is empty %}
+                <div class="text-muted">Noch keine Ergebnisse.</div>
+            {% else %}
+                <ul class="list-group">
+                    {% set rank = 0 %}
+                    {% set lastScore = null %}
+                    {% set actual = 0 %}
+                    {% for row in leaderboard %}
+                        {% set member = row.member %}
+                        {% set score = row.score %}
+                        {% set actual = actual + 1 %}
+                        {% if lastScore is null or score != lastScore %}
+                            {% set rank = actual %}
+                            {% set lastScore = score %}
+                        {% endif %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>
+                                <span class="text-muted me-2" style="width: 2.5ch; display: inline-block; text-align: right;">{{ rank }}.</span>
+                                {{ member.user.username ?? member.user.name }}
+                            </span>
+                            <span class="fw-bold">{{ score }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <div class="row g-3 align-items-start">
+            <div class="col-12 col-lg-7">
+                {% if game.image is defined and game.image %}
+                    <img src="{{ asset(game.image) }}" alt="{{ game.title }}" class="img-fluid rounded border mb-2"
+                         style="max-height: 320px; object-fit: cover; width: 100%;"/>
+                {% endif %}
+                <div class="d-grid gap-2">
+                    <a class="btn btn-primary" id="startGameBtn" href="{{ playUrl }}">Spiel im Archiv starten</a>
+                    <small class="text-muted d-block mt-2">Dein Highscore zählt nicht in die Clash-Punkte.</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 d-grid gap-2 d-md-block">
+            <a href="{{ path('party_clash_games_archive', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zum Archiv</a>
+            <a href="{{ path('party_clash_games', { id: party.id }) }}" class="btn btn-outline-secondary">Zu den aktiven Spielen</a>
+            <a href="{{ path('party_clash_start', { id: party.id }) }}" class="btn btn-outline-secondary">Zurück zum Clash</a>
+        </div>
+    </div>
+{% endblock %}

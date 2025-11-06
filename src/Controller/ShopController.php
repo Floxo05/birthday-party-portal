@@ -41,13 +41,20 @@ final class ShopController extends AbstractController
         $membership = $this->partyMembershipManager->getMembershipForUser($user, $party);
         $balance = $membership?->getBalance() ?? 0;
 
-        // eager load via relation
-        $items = $party->getShopItems();
+        // eager load via relation, filtered by visibility and per-user limit (general enforcement)
+        $items = $party->getShopItems()->filter(fn(ShopItem $i) => $i->isVisible() && $membership && $this->purchaseService->getMaxPurchasable($membership, $i) > 0);
+
+        // compute remaining purchasable per item for UI clamping
+        $remaining = [];
+        foreach ($items as $i) {
+            $remaining[(string) $i->getId()] = $this->purchaseService->getMaxPurchasable($membership, $i);
+        }
 
         return $this->render('shop/list.html.twig', [
             'party' => $party,
             'items' => $items,
             'balance' => $balance,
+            'itemRemaining' => $remaining,
         ]);
     }
 
@@ -105,17 +112,19 @@ final class ShopController extends AbstractController
         }
 
         $item = $this->shopItemRepository->find($itemId);
-        if (!$item instanceof ShopItem || $item->getParty()?->getId() !== $party->getId()) {
+        if (!$item instanceof ShopItem || $item->getParty()?->getId() !== $party->getId() || !$item->isVisible()) {
             throw $this->createNotFoundException('Item nicht gefunden.');
         }
 
         $membership = $this->partyMembershipManager->getMembershipForUser($user, $party);
         $balance = $membership?->getBalance() ?? 0;
+        $maxPurchasable = $membership ? $this->purchaseService->getMaxPurchasable($membership, $item) : 0;
 
         return $this->render('shop/detail.html.twig', [
             'party' => $party,
             'item' => $item,
             'balance' => $balance,
+            'maxPurchasable' => $maxPurchasable,
         ]);
     }
 
@@ -129,7 +138,7 @@ final class ShopController extends AbstractController
         }
 
         $item = $this->shopItemRepository->find($itemId);
-        if (!$item instanceof ShopItem || $item->getParty()?->getId() !== $party->getId()) {
+        if (!$item instanceof ShopItem || $item->getParty()?->getId() !== $party->getId() || !$item->isVisible()) {
             throw $this->createNotFoundException('Item nicht gefunden.');
         }
 

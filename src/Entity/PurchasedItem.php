@@ -36,6 +36,10 @@ class PurchasedItem
     #[ORM\Column(name: 'acquired_at', type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $acquiredAt = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'shop_item_id', referencedColumnName: 'id', nullable: true)]
+    private ?ShopItem $shopItem = null;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -93,6 +97,17 @@ class PurchasedItem
     public function setAcquiredAt(\DateTimeImmutable $acquiredAt): self
     {
         $this->acquiredAt = $acquiredAt;
+        return $this;
+    }
+
+    public function getShopItem(): ?ShopItem
+    {
+        return $this->shopItem;
+    }
+
+    public function setShopItem(?ShopItem $shopItem): self
+    {
+        $this->shopItem = $shopItem;
         return $this;
     }
 

@@ -42,8 +42,8 @@
                                 <a href="{{ path('shop_item_detail', {id: party.id, itemId: item.id}) }}" class="text-decoration-none text-reset"><h5 class="card-title mb-1">{{ item.name }}</h5></a>
                                 <div class="mb-2 small text-muted">Preis: {{ item.pricePoints }} · Lager: {{ item.quantity }}</div>
 
-                                {% set maxByBalance = item.pricePoints > 0 ? (balance // item.pricePoints) : item.quantity %}
-                                {% set maxQty = min([item.quantity, maxByBalance]) %}
+                                {% set maxQty = itemRemaining['' ~ item.id]|default(0) %}
+                                <div class="mb-2 small text-muted">Max: {{ maxQty }}</div>
 
                                 <form method="post" action="{{ path('shop_buy', {id: party.id, itemId: item.id}) }}" class="mt-auto" onsubmit="return confirm('Willst du \'' + '{{ item.name|e('js') }}' + '\' wirklich kaufen?');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('shop-buy-' ~ item.id) }}">
@@ -52,7 +52,7 @@
                                         <button class="btn btn-primary" type="submit" {% if maxQty == 0 %}disabled{% endif %}>Kaufen</button>
                                     </div>
                                     {% if maxQty == 0 %}
-                                        <div class="form-text text-danger">Nicht genug Punkte oder ausverkauft.</div>
+                                        <div class="form-text text-danger">Kauf nicht möglich: Limit pro Person erreicht, ausverkauft oder nicht genug Punkte.</div>
                                     {% endif %}
                                 </form>
                             </div>

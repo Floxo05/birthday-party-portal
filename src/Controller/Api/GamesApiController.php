@@ -50,6 +50,9 @@ class GamesApiController extends AbstractController
             return new JsonResponse(['error' => 'Kein Team gewählt'], Response::HTTP_FORBIDDEN);
         }
 
+        // Practice mode via query flag on callback URL
+        $practice = $request->query->getBoolean('practice', false);
+
         // Game validation
         $game = $this->registry->getGame($slug);
         if (!$game)
@@ -58,9 +61,9 @@ class GamesApiController extends AbstractController
         }
         $now = new \DateTimeImmutable();
 
-        // If closed or ended: finalize and reject further submissions
+        // If closed or ended and not practice: finalize and reject further submissions
         $closed = (bool)($game['closed'] ?? false);
-        if ($closed || ($game['endAt'] instanceof \DateTimeImmutable && $game['endAt'] < $now))
+        if (!$practice && ($closed || ($game['endAt'] instanceof \DateTimeImmutable && $game['endAt'] < $now)))
         {
             $this->finalizer->finalizePartyGame($party, $game['slug'], $game['rankPoints']);
             return new JsonResponse([
@@ -72,8 +75,8 @@ class GamesApiController extends AbstractController
             ], Response::HTTP_GONE);
         }
 
-        // Not yet started
-        if ($game['startAt'] instanceof \DateTimeImmutable && $game['startAt'] > $now)
+        // Not yet started (only enforced in non-practice mode)
+        if (!$practice && ($game['startAt'] instanceof \DateTimeImmutable && $game['startAt'] > $now))
         {
             return new JsonResponse(['error' => 'Game not active yet'], Response::HTTP_FORBIDDEN);
         }
@@ -97,11 +100,14 @@ class GamesApiController extends AbstractController
         $score = isset($data['score']) ? (int)$data['score'] : 0;
         $score = max(0, $score);
 
+        // Use practice slug to keep archive scores separate and excluded from clash points
+        $storeSlug = $practice ? ($game['slug'] . ':practice') : $game['slug'];
+
         // Upsert score (best per member)
         $gs = $this->scores->findOneBy([
             'party' => $party,
             'partyMember' => $pm,
-            'gameSlug' => $game['slug'],
+            'gameSlug' => $storeSlug,
         ]);
         $nowDt = new \DateTimeImmutable();
         if (!$gs instanceof GameScore)
@@ -109,7 +115,7 @@ class GamesApiController extends AbstractController
             $gs = new GameScore();
             $gs->setParty($party)
                 ->setPartyMember($pm)
-                ->setGameSlug($game['slug'])
+                ->setGameSlug($storeSlug)
                 ->setBestScore($score)
                 ->setAttempts(1)
                 ->setLastSubmittedAt($nowDt);
@@ -125,14 +131,15 @@ class GamesApiController extends AbstractController
         $this->em->persist($gs);
         $this->em->flush();
 
+        $url = $practice
+            ? $this->generateUrl('party_clash_game_detail_archive', ['id' => (string)$party->getId(), 'slug' => $game['slug']], UrlGeneratorInterface::ABSOLUTE_URL)
+            : $this->generateUrl('party_clash_game_detail', ['id' => (string)$party->getId(), 'slug' => $game['slug']], UrlGeneratorInterface::ABSOLUTE_URL);
+
         return new JsonResponse([
             'status' => 'ok',
             'bestScore' => $gs->getBestScore(),
             'attempts' => $gs->getAttempts(),
-            'scoreboardUrl' => $this->generateUrl('party_clash_game_detail', [
-                'id' => (string)$party->getId(),
-                'slug' => $game['slug'],
-            ], UrlGeneratorInterface::ABSOLUTE_URL),
+            'scoreboardUrl' => $url,
         ]);
     }
 
