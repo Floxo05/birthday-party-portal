@@ -38,6 +38,12 @@ class ShopItem
     #[ORM\ManyToOne]
     private ?Media $media = null;
 
+    #[ORM\Column(type: Types::BOOLEAN, options: ['default' => true])]
+    private bool $visible = true;
+
+    #[ORM\Column(options: ['default' => -1])]
+    private int $maxPerUser = -1;
+
     public function getId(): ?Uuid
     {
         return $this->id;
@@ -106,6 +112,29 @@ class ShopItem
     public function setMedia(?Media $media): self
     {
         $this->media = $media;
+        return $this;
+    }
+
+    public function isVisible(): bool
+    {
+        return $this->visible;
+    }
+
+    public function setVisible(bool $visible): self
+    {
+        $this->visible = $visible;
+        return $this;
+    }
+
+    public function getMaxPerUser(): int
+    {
+        return $this->maxPerUser;
+    }
+
+    public function setMaxPerUser(int $maxPerUser): self
+    {
+        // -1 means unlimited; otherwise clamp to at least 1
+        $this->maxPerUser = $maxPerUser === -1 ? -1 : max(1, $maxPerUser);
         return $this;
     }
 

@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\Uid\Uuid;
 
@@ -72,6 +73,8 @@ class ShopItemCrudController extends AbstractHostCrudController
         yield TextareaField::new('description', 'Beschreibung')->onlyOnForms();
         yield IntegerField::new('pricePoints', 'Preis (Punkte)');
         yield IntegerField::new('quantity', 'Anzahl');
+        yield IntegerField::new('maxPerUser', 'Max pro Person')->setHelp('−1 = unbegrenzt');
+        yield BooleanField::new('visible', 'Sichtbar');
 
         yield AssociationField::new('media', 'Bild')
             ->setRequired(false)

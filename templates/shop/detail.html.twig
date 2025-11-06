@@ -7,7 +7,7 @@
         <a href="{{ path('shop_list', {id: party.id}) }}" class="btn btn-link">← Zurück zum Shop</a>
         <a href="{{ path('party_show', {id: party.id}) }}" class="btn btn-link">← Zurück zur Party</a>
         <h1 class="h3">{{ item.name }}</h1>
-        <p class="text-muted">Guthaben: <strong>{{ balance }}</strong> Punkte · Preis: <strong>{{ item.pricePoints }}</strong> · Lager: <strong>{{ item.quantity }}</strong></p>
+        <p class="text-muted">Guthaben: <strong>{{ balance }}</strong> Punkte · Preis: <strong>{{ item.pricePoints }}</strong> · Lager: <strong>{{ item.quantity }}</strong> · Max: <strong>{{ maxPurchasable|default(0) }}</strong></p>
         <div class="mt-2">
             <a href="{{ path('purchased_list', {id: party.id}) }}" class="btn btn-outline-secondary btn-sm">Meine Gegenstände ansehen</a>
         </div>
@@ -27,8 +27,7 @@
                 <p class="mb-0">{{ item.description ?: 'Keine Beschreibung' }}</p>
             </div>
 
-            {% set maxByBalance = item.pricePoints > 0 ? (balance // item.pricePoints) : item.quantity %}
-            {% set maxQty = min([item.quantity, maxByBalance]) %}
+            {% set maxQty = maxPurchasable|default(0) %}
 
             <form method="post" action="{{ path('shop_buy', {id: party.id, itemId: item.id}) }}" onsubmit="return confirm('Willst du \'' + '{{ item.name|e('js') }}' + '\' wirklich kaufen?');">
                 <input type="hidden" name="_token" value="{{ csrf_token('shop-buy-' ~ item.id) }}">
@@ -37,7 +36,7 @@
                     <button class="btn btn-primary" type="submit" {% if maxQty == 0 %}disabled{% endif %}>Kaufen</button>
                 </div>
                 {% if maxQty == 0 %}
-                    <div class="form-text text-danger">Nicht genug Punkte oder ausverkauft.</div>
+                    <div class="form-text text-danger">Kauf nicht möglich: Limit pro Person erreicht, ausverkauft oder nicht genug Punkte.</div>
                 {% endif %}
             </form>
         </div>
