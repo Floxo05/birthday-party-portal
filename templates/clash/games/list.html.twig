@@ -4,9 +4,12 @@
 
 {% block body %}
     <div class="container py-4">
-        <h1 class="mb-3">Clash – Spiele</h1>
-        <p class="text-muted">Wähle ein Spiel. Innerhalb des freigeschalteten Zeitraums kannst du Punkte sammeln. Die
-            Bestenliste zählt für euren Clash!</p>
+        <h1 class="mb-1">Clash – Spiele</h1>
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-3">
+            <p class="text-muted mb-2 mb-md-0">Wähle ein Spiel. Innerhalb des freigeschalteten Zeitraums kannst du Punkte sammeln. Die
+                Bestenliste zählt für euren Clash!</p>
+            <a href="{{ path('party_clash_games_archive', { id: party.id }) }}" class="btn btn-outline-primary btn-sm">Spielearchiv (zählt nicht)</a>
+        </div>
 
         {# Scoreboard with total earned team points across games #}
         {% if scoreboard is defined and scoreboard is not empty %}
@@ -15,7 +18,9 @@
                     <h2 class="h4 mb-0 me-md-3">Scoreboard – gesammelte Teampunkte</h2>
                     <span class="text-muted small mt-1 mt-md-0">Summe aus allen abgeschlossenen Spielen</span>
                 </div>
-                <div class="table-responsive">
+                {% set limit = scoreboardLimit is defined ? scoreboardLimit : 10 %}
+                {% set hasMore = scoreboard|length > limit %}
+                <div class="table-responsive" id="scoreboard-wrapper">
                     <table class="table align-middle mb-0 table-hover">
                         <thead>
                         <tr>
@@ -39,7 +44,8 @@
                             {% set m = row.member %}
                             {% set uname = m.user ? m.user.username : 'Unbekannt' %}
                             {% set tm = m.clashTeam %}
-                            <tr>
+                            {% set hidden = hasMore and actual > limit %}
+                            <tr class="{{ hidden ? 'd-none extra-score-row' : '' }}">
                                 <td class="text-muted">{{ rank }}</td>
                                 <td>{{ uname }}</td>
                                 <td>
@@ -57,6 +63,25 @@
                         </tbody>
                     </table>
                 </div>
+                {% if hasMore %}
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="toggle-scoreboard">Mehr anzeigen</button>
+                    </div>
+                    <script>
+                        (function(){
+                            const btn = document.getElementById('toggle-scoreboard');
+                            if(!btn) return;
+                            const hiddenClass = 'd-none';
+                            let expanded = false;
+                            btn.addEventListener('click', function(){
+                                const rows = document.querySelectorAll('#scoreboard-wrapper .extra-score-row');
+                                rows.forEach(r => r.classList.toggle(hiddenClass));
+                                expanded = !expanded;
+                                btn.textContent = expanded ? 'Weniger anzeigen' : 'Mehr anzeigen';
+                            });
+                        })();
+                    </script>
+                {% endif %}
             </div>
         {% endif %}
 

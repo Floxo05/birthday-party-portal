@@ -14,7 +14,7 @@ use App\Service\GameRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[Route('/party/{id}/clash/games', requirements: ['id' => '[0-9a-f\-]{36}'])]
@@ -129,13 +129,29 @@ class GamesController extends AbstractController
             $bn = $b['member']->getUser()?->getUsername() ?? '';
             return strcmp($an, $bn);
         });
-        $scoreboard = array_slice(array_values($aggregate), 0, 10);
+        $scoreboard = array_values($aggregate);
+        $scoreboardLimit = 10;
 
         return $this->render('clash/games/list.html.twig', [
             'party' => $party,
             'me' => $pm,
             'games' => $games,
             'scoreboard' => $scoreboard,
+            'scoreboardLimit' => $scoreboardLimit,
+            'archiveLink' => true,
+        ]);
+    }
+
+    #[Route('/archive', name: 'party_clash_games_archive', methods: ['GET'])]
+    public function archiveList(Party $party): Response
+    {
+        $pm = $this->requireMembership($party);
+        $games = $this->registry->listGames();
+        usort($games, fn($a, $b) => strcmp($a['title'] ?? '', $b['title'] ?? ''));
+        return $this->render('clash/games/archive_list.html.twig', [
+            'party' => $party,
+            'me' => $pm,
+            'games' => $games,
         ]);
     }
 
@@ -183,6 +199,44 @@ class GamesController extends AbstractController
             'me' => $pm,
             'game' => $game,
             'active' => $active,
+            'leaderboard' => $leaderboard,
+            'playUrl' => $playUrl,
+        ]);
+    }
+
+    #[Route('/archive/{slug}', name: 'party_clash_game_detail_archive', methods: ['GET'])]
+    public function archiveDetail(Party $party, string $slug): Response
+    {
+        $pm = $this->requireMembership($party);
+        $game = $this->registry->getGame($slug);
+        if (!$game)
+        {
+            throw $this->createNotFoundException();
+        }
+        // Practice slug to keep archive scores separate from official ones
+        $practiceSlug = $game['slug'] . ':practice';
+        $leaderboard = $this->scores->getLeaderboard($party, $practiceSlug, 100);
+
+        // Always allow playing in archive and mark as not counting
+        $callbackUrl = $this->generateUrl(
+            'party_clash_game_submit',
+            ['id' => (string)$party->getId(), 'slug' => $game['slug']],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+        // Add practice=1 flag so API stores under practice slug and bypasses timing
+        $callbackUrl .= (str_contains($callbackUrl, '?') ? '&' : '?') . 'practice=1';
+        $query = http_build_query([
+            'partyId' => (string)$party->getId(),
+            'playerId' => (string)$pm->getId(),
+            'gameId' => $game['slug'],
+            'callbackUrl' => $callbackUrl,
+        ]);
+        $playUrl = $game['path'] . '?' . $query;
+
+        return $this->render('clash/games/archive_detail.html.twig', [
+            'party' => $party,
+            'me' => $pm,
+            'game' => $game,
             'leaderboard' => $leaderboard,
             'playUrl' => $playUrl,
         ]);
