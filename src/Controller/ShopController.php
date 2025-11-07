@@ -41,13 +41,16 @@ final class ShopController extends AbstractController
         $membership = $this->partyMembershipManager->getMembershipForUser($user, $party);
         $balance = $membership?->getBalance() ?? 0;
 
-        // eager load via relation, filtered by visibility and per-user limit (general enforcement)
-        $items = $party->getShopItems()->filter(fn(ShopItem $i) => $i->isVisible() && $membership && $this->purchaseService->getMaxPurchasable($membership, $i) > 0);
+        // eager load via relation, filtered by visibility only — show all visible items regardless of purchasability
+        $items = $party->getShopItems()->filter(fn(ShopItem $i) => $i->isVisible());
 
-        // compute remaining purchasable per item for UI clamping
+        // compute remaining purchasable per item for UI clamping (0 if none or no membership)
         $remaining = [];
         foreach ($items as $i) {
-            $remaining[(string) $i->getId()] = $this->purchaseService->getMaxPurchasable($membership, $i);
+            $remaining[(string)$i->getId()] = $membership ? $this->purchaseService->getMaxPurchasable(
+                $membership,
+                $i
+            ) : 0;
         }
 
         return $this->render('shop/list.html.twig', [
